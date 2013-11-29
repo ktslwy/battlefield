@@ -1,0 +1,27 @@
+{
+    "name": "battlefield-prototype",
+    "version": "0.0.1",
+    "description": "Battlefield",
+    "author": "Lawrence Lau <ktslwy@gmail.com>",
+    "main": "index.js",
+    "scripts": {
+        "test": "istanbul cover --dir coverage ./node_modules/.bin/_mocha test/unit/ -- --recursive --reporter tap --timeout 10000"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ktslwy/battlefield.git"
+    },
+    "keywords": [
+        "battlefield"
+    ],
+    "dependencies": {
+    },
+    "devDependencies": {
+        "chai": "~1.7.2",
+        "mocha": "~1.12.0",
+        "istanbul": "~0.1.42"
+    },
+    "engines": {
+        "node": ">=0.10"
+    }
+}
