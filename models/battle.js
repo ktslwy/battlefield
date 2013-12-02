@@ -4,7 +4,7 @@ var _           = require('lodash'),
     positionMap = require('../lib/position-map'),
     BaseUnit    = require('./base-unit');
 
-function Combat(config) {
+function Battle(config) {
     var self = this;
 
     if (config) {
@@ -21,17 +21,17 @@ function Combat(config) {
     }
 }
 
-Combat.prototype.round = 1;
+Battle.prototype.round = 1;
 
-Combat.prototype.leftFormation = null;
+Battle.prototype.leftFormation = null;
 
-Combat.prototype.rightFormation = null;
+Battle.prototype.rightFormation = null;
 
-Combat.prototype._allUnits = null;
+Battle.prototype._allUnits = null;
 
-Combat.prototype._roundQueue = null;
+Battle.prototype._roundQueue = null;
 
-Combat.prototype._getAllUnits = function() {
+Battle.prototype._getAllUnits = function() {
     var self = this;
 
     if (!self._allUnits) {
@@ -41,14 +41,14 @@ Combat.prototype._getAllUnits = function() {
     return self._allUnits;
 };
 
-Combat.prototype._setupRoundQueue = function() {
+Battle.prototype._setupRoundQueue = function() {
     var self    = this,
         units   = self._getCurrentRoundUnits();
 
     self._roundQueue = _.shuffle(units);
 };
 
-Combat.prototype._getCurrentRoundUnits = function() {
+Battle.prototype._getCurrentRoundUnits = function() {
     var self    = this,
         round   = self.round,
         units   = self._getAllUnits();
@@ -56,6 +56,28 @@ Combat.prototype._getCurrentRoundUnits = function() {
     return units.filter(function(unit){
         return round % unit.stats.actionInterval === 0;
     });
-}
+};
 
-module.exports = Combat;
+Battle.prototype._getTargetUnit = function (unit) {
+    var self            = this,
+        unitPosition    = unit.position,
+        unitSide        = unit.side,
+        unitRow         = Math.floor(unitPosition/5),
+        targetPositions = positionMap[unitSide][unitRow],
+        targetSide      = unitSide === BaseUnit.SIDE_LEFT ? BaseUnit.SIDE_RIGHT : BaseUnit.SIDE_LEFT,
+        targetFormation = targetSide === BaseUnit.SIDE_LEFT ? self.leftFormation : self.rightFormation,
+        targetUnit;
+
+    targetPositions.some(function(position){
+        var foundUnit = targetFormation.getUnitByPosition(position);
+        if (foundUnit && foundUnit.isAlive()) {
+            targetUnit = foundUnit;
+            return true;
+        }
+        return false;
+    });
+
+    return targetUnit;
+};
+
+module.exports = Battle;

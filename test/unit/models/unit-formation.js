@@ -39,4 +39,16 @@ describe('UnitFormation', function(){
 
     });
 
+    describe('#getUnitByPosition()', function(){
+
+        it('should return unit of the given position', function(){
+            var unitFormation = new UnitFormation({formation: allLiFormation}),
+                unit = unitFormation.getUnitByPosition(11);
+
+            assert.isTrue(unit instanceof LightInfantry);
+            assert.equal(unit.position, 11);
+        })
+
+    });
+
 });

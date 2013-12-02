@@ -102,4 +102,17 @@ describe('Battle', function(){
 
     });
 
+    describe('#_getTargetUnit()', function(){
+
+        it('should return target unit based on map', function(){
+            var battleConfig = getBattleConfigWithFormations(),
+                battle       = new Battle(battleConfig),
+                targetUnit   = battle._getTargetUnit({position: 7, side: BaseUnit.SIDE_LEFT});
+
+            assert.equal(targetUnit.position, 9);
+            assert.equal(targetUnit.side, BaseUnit.SIDE_RIGHT);
+        });
+
+    });
+
 });

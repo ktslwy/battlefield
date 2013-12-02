@@ -30,4 +30,19 @@ UnitFormation.prototype.setSide = function(side) {
     });
 };
 
+UnitFormation.prototype.getUnitByPosition = function(position) {
+    var self = this,
+        foundUnit;
+
+    self.formation.some(function(unit){
+        if (unit.position === position) {
+            foundUnit = unit;
+            return true;
+        }
+        return false;
+    });
+
+    return foundUnit;
+};
+
 module.exports = UnitFormation;

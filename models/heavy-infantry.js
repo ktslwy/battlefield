@@ -1,12 +1,15 @@
 'use strict';
 
-var BaseUnit = require('./base-unit');
+var BaseUnit = require('./base-unit'),
+    _        = require('lodash');
 
-function HeavyInfantry() {}
+function HeavyInfantry() {
+    var self = this;
 
-HeavyInfantry.prototype = new BaseUnit();
+    self.stats = _.clone(HeavyInfantry.baseStats);
+}
 
-HeavyInfantry.prototype.stats = {
+HeavyInfantry.baseStats = {
 
     healthPoint: 20,
 
@@ -17,6 +20,8 @@ HeavyInfantry.prototype.stats = {
     actionInterval: 2
 
 };
+
+HeavyInfantry.prototype = new BaseUnit();
 
 HeavyInfantry.prototype.toString = function() {
     return '[HeavyInfantry]';
