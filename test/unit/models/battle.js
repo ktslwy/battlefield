@@ -5,6 +5,7 @@ var assert          = require('chai').assert,
     allHiFormation  = require('../../../samples/formation/all-hi'),
     LightInfantry   = require('../../../models/light-infantry'),
     HeavyInfantry   = require('../../../models/heavy-infantry');
+    BaseUnit        = require('../../../models/base-unit');
 
 function getBattleConfigWithFormations() {
     return {
@@ -16,14 +17,21 @@ function getBattleConfigWithFormations() {
 describe('Battle', function(){
 
     it('should instantiate without config', function(){
-    	var battle = new Battle();
-    	assert.isTrue(battle instanceof Battle);
+        var battle = new Battle();
+        assert.isTrue(battle instanceof Battle);
     });
 
     it('should instantiate with config', function(){
         var battleConfig = getBattleConfigWithFormations(),
             battle       = new Battle(battleConfig);
+
         assert.isTrue(battle instanceof Battle);
+        battle.leftFormation.formation.forEach(function(unit){
+            assert.equal(unit.side, BaseUnit.SIDE_LEFT);
+        })
+        battle.rightFormation.formation.forEach(function(unit){
+            assert.equal(unit.side, BaseUnit.SIDE_RIGHT);
+        })
     });
 
     describe('#_getAllUnits()', function(){
@@ -33,15 +41,15 @@ describe('Battle', function(){
                 battle       = new Battle(battleConfig),
                 units        = battle._getAllUnits();
 
-            allLiFormation.forEach(function(entry, i){
-                assert.isTrue(units[i].unit instanceof LightInfantry);
-                assert.equal(units[i].position, entry.position);
+            allLiFormation.forEach(function(unit, i){
+                assert.isTrue(units[i] instanceof LightInfantry);
+                assert.equal(units[i].position, unit.position);
             });
 
-            allHiFormation.forEach(function(entry, i){
+            allHiFormation.forEach(function(unit, i){
                 i += allLiFormation.length;
-                assert.isTrue(units[i].unit instanceof HeavyInfantry);
-                assert.equal(units[i].position, entry.position);
+                assert.isTrue(units[i] instanceof HeavyInfantry);
+                assert.equal(units[i].position, unit.position);
             })
         });
 
@@ -55,22 +63,22 @@ describe('Battle', function(){
                 units        = battle._getCurrentRoundUnits();
 
             assert.equal(units.length, allLiFormation.length);
-            allLiFormation.forEach(function(entry, i){
-                assert.isTrue(units[i].unit instanceof LightInfantry);
-                assert.equal(units[i].position, entry.position);
+            allLiFormation.forEach(function(unit, i){
+                assert.isTrue(units[i] instanceof LightInfantry);
+                assert.equal(units[i].position, unit.position);
             });
 
             battle.round = 2;
             units = battle._getCurrentRoundUnits();
             assert.equal(units.length, allLiFormation.length + allHiFormation.length);
-            allLiFormation.forEach(function(entry, i){
-                assert.isTrue(units[i].unit instanceof LightInfantry);
-                assert.equal(units[i].position, entry.position);
+            allLiFormation.forEach(function(unit, i){
+                assert.isTrue(units[i] instanceof LightInfantry);
+                assert.equal(units[i].position, unit.position);
             });
-            allHiFormation.forEach(function(entry, i){
+            allHiFormation.forEach(function(unit, i){
                 i += allLiFormation.length;
-                assert.isTrue(units[i].unit instanceof HeavyInfantry);
-                assert.equal(units[i].position, entry.position);
+                assert.isTrue(units[i] instanceof HeavyInfantry);
+                assert.equal(units[i].position, unit.position);
             })
         });
 

@@ -5,25 +5,28 @@ var _           = require('lodash'),
     unitFactory = new UnitFactory();
 
 function UnitFormation(config) {
-    if (config) {
-        this.formation = _.cloneDeep(config.formation);
-    }
+    var self = this;
 
-    if (this.formation) {
-        this._initFormation();
+    if (config && config.formation) {
+        self._initFormation(config.formation);
     }
 }
 
 UnitFormation.prototype.formation = null;
 
-UnitFormation.prototype._initFormation = function() {
-    var self = this,
-        formation = self.formation;
+UnitFormation.prototype._initFormation = function(formationConfig) {
+    var self = this;
 
-    formation.forEach(function(entry){
-        if (entry.unit) {
-            entry.unit = unitFactory.buildUnit(entry.unit);
-        }
+    self.formation = formationConfig.map(function(entry){
+        return unitFactory.buildUnit(entry);
+    });
+};
+
+UnitFormation.prototype.setSide = function(side) {
+    var self = this;
+
+    self.formation.forEach(function(unit){
+        unit.side = side;
     });
 };
 

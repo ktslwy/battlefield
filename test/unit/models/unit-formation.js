@@ -1,23 +1,42 @@
 var assert          = require('chai').assert,
     UnitFormation   = require('../../../models/unit-formation'),
-    allLiFormation	= require('../../../samples/formation/all-li'),
-    LightInfantry   = require('../../../models/light-infantry');
+    allLiFormation  = require('../../../samples/formation/all-li'),
+    LightInfantry   = require('../../../models/light-infantry'),
+    BaseUnit        = require('../../../models/base-unit');
 
 describe('UnitFormation', function(){
 
     it('should instantiate without config', function(){
-    	var unitFormation = new UnitFormation();
-    	assert.isTrue(unitFormation instanceof UnitFormation);
+        var unitFormation = new UnitFormation();
+        assert.isTrue(unitFormation instanceof UnitFormation);
     });
 
     it('should instantiate with config', function(){
-    	var unitFormation = new UnitFormation({formation: allLiFormation});
+        var unitFormation = new UnitFormation({formation: allLiFormation});
 
-    	assert.isTrue(unitFormation instanceof UnitFormation);
-        unitFormation.formation.forEach(function(entry, i){
-            assert.isTrue(entry.unit instanceof LightInfantry);
-            assert.equal(entry.position, allLiFormation[i].position);
+        assert.isTrue(unitFormation instanceof UnitFormation);
+        unitFormation.formation.forEach(function(unit, i){
+            assert.isTrue(unit instanceof LightInfantry);
+            assert.equal(unit.position, allLiFormation[i].position);
         });
+    });
+
+    describe('#setSide()', function(){
+
+        it('should set side of all units', function(){
+            var unitFormation = new UnitFormation({formation: allLiFormation});
+
+            unitFormation.setSide(BaseUnit.SIDE_LEFT);
+            unitFormation.formation.forEach(function(unit, i){
+                assert.equal(unit.side, BaseUnit.SIDE_LEFT);
+            });
+
+            unitFormation.setSide(null);
+            unitFormation.formation.forEach(function(unit, i){
+                assert.equal(unit.side, null);
+            });
+        });
+
     });
 
 });

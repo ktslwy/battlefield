@@ -1,6 +1,10 @@
 'use strict';
 
+var BaseUnit = require('./base-unit');
+
 function HeavyInfantry() {}
+
+HeavyInfantry.prototype = new BaseUnit();
 
 HeavyInfantry.prototype.stats = {
 
@@ -15,7 +19,7 @@ HeavyInfantry.prototype.stats = {
 };
 
 HeavyInfantry.prototype.toString = function() {
-	return '[HeavyInfantry]';
+    return '[HeavyInfantry]';
 };
 
 module.exports = HeavyInfantry;

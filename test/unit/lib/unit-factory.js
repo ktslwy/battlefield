@@ -8,13 +8,13 @@ describe('UnitFactory', function() {
     describe('#buildUnit()', function() {
 
         it('should build unit from string config', function(){
-        	var heavyInfantry = unitFactory.buildUnit('hi');
-        	assert.isTrue(heavyInfantry instanceof HeavyInfantry);
+            var heavyInfantry = unitFactory.buildUnit({type: 'hi', position: 1});
+            assert.isTrue(heavyInfantry instanceof HeavyInfantry);
         });
 
         it('should not build unit without config', function(){
-        	var unit = unitFactory.buildUnit();
-        	assert.isFalse(!!unit);
+            var unit = unitFactory.buildUnit();
+            assert.isFalse(!!unit);
         });
 
     });

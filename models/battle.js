@@ -1,6 +1,8 @@
 'use strict';
 
-var _ = require('lodash');
+var _           = require('lodash'),
+    positionMap = require('../lib/position-map'),
+    BaseUnit    = require('./base-unit');
 
 function Combat(config) {
     var self = this;
@@ -8,6 +10,14 @@ function Combat(config) {
     if (config) {
         self.leftFormation  = config.leftFormation;
         self.rightFormation = config.rightFormation;
+    }
+
+    if (self.leftFormation) {
+        self.leftFormation.setSide(BaseUnit.SIDE_LEFT);
+    }
+
+    if (self.rightFormation) {
+        self.rightFormation.setSide(BaseUnit.SIDE_RIGHT);
     }
 }
 
@@ -44,7 +54,7 @@ Combat.prototype._getCurrentRoundUnits = function() {
         units   = self._getAllUnits();
 
     return units.filter(function(unit){
-        return round % unit.unit.stats.actionInterval === 0;
+        return round % unit.stats.actionInterval === 0;
     });
 }
 
