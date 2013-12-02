@@ -19,7 +19,8 @@
     "devDependencies": {
         "chai": "~1.7.2",
         "mocha": "~1.12.0",
-        "istanbul": "~0.1.42"
+        "istanbul": "~0.1.42",
+        "lodash": "~2.4.0"
     },
     "engines": {
         "node": ">=0.10"

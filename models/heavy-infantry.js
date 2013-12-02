@@ -10,8 +10,12 @@ HeavyInfantry.prototype.stats = {
 
     defense: 2,
 
-    attackRate: 1
+    actionInterval: 2
 
+};
+
+HeavyInfantry.prototype.toString = function() {
+	return '[HeavyInfantry]';
 };
 
 module.exports = HeavyInfantry;

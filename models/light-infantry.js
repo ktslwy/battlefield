@@ -10,8 +10,12 @@ LightInfantry.prototype.stats = {
 
     defense: 1,
 
-    attackRate: 2
+    actionInterval: 1
 
+};
+
+LightInfantry.prototype.toString = function() {
+	return '[LightInfantry]';
 };
 
 module.exports = LightInfantry;
