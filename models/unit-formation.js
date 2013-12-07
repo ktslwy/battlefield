@@ -45,4 +45,23 @@ UnitFormation.prototype.getUnitByPosition = function(position) {
     return foundUnit;
 };
 
+UnitFormation.prototype.areSomeAlive = function() {
+    var self = this;
+
+    return self.formation.some(function(unit){
+        return unit.isAlive();
+    });
+};
+
+UnitFormation.prototype.toString = function() {
+    var self = this,
+        string = '';
+
+    self.formation.forEach(function(unit){
+        string += unit.toString() + '\n';
+    });
+
+    return string;
+};
+
 module.exports = UnitFormation;

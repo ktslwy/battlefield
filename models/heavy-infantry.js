@@ -23,8 +23,6 @@ HeavyInfantry.baseStats = {
 
 HeavyInfantry.prototype = new BaseUnit();
 
-HeavyInfantry.prototype.toString = function() {
-    return '[HeavyInfantry]';
-};
+HeavyInfantry.prototype.name = 'HeavyInfantry';
 
 module.exports = HeavyInfantry;

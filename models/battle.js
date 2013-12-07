@@ -21,7 +21,7 @@ function Battle(config) {
     }
 }
 
-Battle.prototype.round = 1;
+Battle.prototype.round = 0;
 
 Battle.prototype.leftFormation = null;
 
@@ -31,14 +31,57 @@ Battle.prototype._allUnits = null;
 
 Battle.prototype._roundQueue = null;
 
-Battle.prototype._getAllUnits = function() {
+Battle.prototype._winningSide = null;
+
+Battle.prototype.start = function() {
     var self = this;
 
-    if (!self._allUnits) {
-        self._allUnits = self.leftFormation.formation.concat(self.rightFormation.formation);
+    while (!self._getWinningSide()) {
+        self.nextRound();
+    }
+};
+
+Battle.prototype.nextRound = function() {
+    var self = this,
+        winningSide = self._getWinningSide();
+
+    if (winningSide) {
+        return;
     }
 
-    return self._allUnits;
+    self.round++;
+    console.log('\nRound ' + self.round);
+
+    self._setupRoundQueue();
+    self._executeRoundQueue();
+
+    console.log('LEFT  :' + self.leftFormation.toString());
+    console.log('RIGHT :' + self.rightFormation.toString());
+};
+
+Battle.prototype._getWinningSide = function() {
+    var self = this,
+        isLeftAlive,
+        isRightAlive;
+
+    if (self._winningSide) {
+        return self._winningSide;
+    }
+
+    isLeftAlive  = self.leftFormation.areSomeAlive();
+    isRightAlive = self.rightFormation.areSomeAlive();
+
+    if (isLeftAlive && isRightAlive) {
+        return null;
+    }
+
+    if (isLeftAlive) {
+        self._winningSide = BaseUnit.SIDE_LEFT;
+    } else if (isRightAlive) {
+        self._winningSide = BaseUnit.SIDE_RIGHT;
+    }
+
+    return self._winningSide;
 };
 
 Battle.prototype._setupRoundQueue = function() {
@@ -48,13 +91,20 @@ Battle.prototype._setupRoundQueue = function() {
     self._roundQueue = _.shuffle(units);
 };
 
-Battle.prototype._getCurrentRoundUnits = function() {
-    var self    = this,
-        round   = self.round,
-        units   = self._getAllUnits();
+Battle.prototype._executeRoundQueue = function() {
+    var self = this,
+        queue = self._roundQueue;
 
-    return units.filter(function(unit){
-        return round % unit.stats.actionInterval === 0;
+    queue.forEach(function(unit){
+        if (!unit.isAlive()) {
+            return;
+        }
+
+        var targetUnit = self._getTargetUnit(unit);
+
+        if (targetUnit) {
+            unit.attack(targetUnit);
+        }
     });
 };
 
@@ -62,7 +112,7 @@ Battle.prototype._getTargetUnit = function (unit) {
     var self            = this,
         unitPosition    = unit.position,
         unitSide        = unit.side,
-        unitRow         = Math.floor(unitPosition/5),
+        unitRow         = Math.floor((unitPosition - 1) / 5),
         targetPositions = positionMap[unitSide][unitRow],
         targetSide      = unitSide === BaseUnit.SIDE_LEFT ? BaseUnit.SIDE_RIGHT : BaseUnit.SIDE_LEFT,
         targetFormation = targetSide === BaseUnit.SIDE_LEFT ? self.leftFormation : self.rightFormation,
@@ -78,6 +128,26 @@ Battle.prototype._getTargetUnit = function (unit) {
     });
 
     return targetUnit;
+};
+
+Battle.prototype._getCurrentRoundUnits = function() {
+    var self    = this,
+        round   = self.round,
+        units   = self._getAllUnits();
+
+    return units.filter(function(unit){
+        return round % unit.stats.actionInterval === 0;
+    });
+};
+
+Battle.prototype._getAllUnits = function() {
+    var self = this;
+
+    if (!self._allUnits) {
+        self._allUnits = self.leftFormation.formation.concat(self.rightFormation.formation);
+    }
+
+    return self._allUnits;
 };
 
 module.exports = Battle;

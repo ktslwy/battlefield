@@ -17,6 +17,20 @@ describe('UnitFactory', function() {
             assert.isFalse(!!unit);
         });
 
+        it('should not build unit without type in config', function(){
+            var unit = unitFactory.buildUnit({});
+            assert.isFalse(!!unit);
+        });
+
+    });
+
+    describe('#_buildUnitFromStandard()', function() {
+
+        it('should not build unit without mataching standard key', function(){
+            var unit = unitFactory._buildUnitFromStandard();
+            assert.isFalse(!!unit);
+        });
+
     });
 
 });

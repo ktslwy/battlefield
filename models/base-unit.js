@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('lodash');
+var _  = require('lodash');
 
 function BaseUnit() {}
 
@@ -36,7 +36,7 @@ BaseUnit.prototype._computeDamage = function() {
 
 BaseUnit.prototype.attack = function(targetUnit) {
     var self = this,
-        damage = self._computeDamage(targetUnit);
+        damage = self._computeDamage();
 
     targetUnit._takeDamage(damage);
 };
@@ -59,6 +59,19 @@ BaseUnit.prototype._takeDamage = function(grossDamage) {
 BaseUnit.prototype._die = function() {
     var self = this;
     self.status = BaseUnit.STATUS_DEAD;
+};
+
+BaseUnit.prototype.toString = function() {
+    var self    = this,
+        string  = '[' + self.name + '] (' + self.status + ') POS=' + (self.position ? self.position : ''),
+        stats   = self.stats,
+        statKey;
+
+    for (statKey in stats) {
+        string += ' ' + statKey.substr(0, 3).toUpperCase() + '=' + stats[statKey];
+    }
+
+    return string;
 };
 
 module.exports = BaseUnit;

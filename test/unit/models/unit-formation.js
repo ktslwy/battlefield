@@ -47,7 +47,52 @@ describe('UnitFormation', function(){
 
             assert.isTrue(unit instanceof LightInfantry);
             assert.equal(unit.position, 11);
-        })
+        });
+
+    });
+
+    describe('#areSomeAlive()', function(){
+
+        it('should return true if all units are alive', function(){
+            var unitFormation = new UnitFormation({formation: allLiFormation}),
+                areSomeAlive = unitFormation.areSomeAlive();
+
+            assert.isTrue(areSomeAlive);
+        });
+
+        it('should return true if some units are alive', function(){
+            var unitFormation = new UnitFormation({formation: allLiFormation}),
+                areSomeAlive;
+
+            unitFormation.getUnitByPosition(11)._die();
+            areSomeAlive = unitFormation.areSomeAlive();
+
+            assert.isTrue(areSomeAlive);
+        });
+
+        it('should return false if no units are alive', function(){
+            var unitFormation = new UnitFormation({formation: allLiFormation}),
+                areSomeAlive;
+
+            unitFormation.formation.forEach(function(unit){
+                unit._die();
+            });
+            areSomeAlive = unitFormation.areSomeAlive();
+
+            assert.isFalse(areSomeAlive);
+        });
+
+    });
+
+    describe('#toString()', function(){
+
+        it('should print info', function(){
+            var unitFormation = new UnitFormation({formation: allLiFormation.slice(0, 2)}),
+                expected;
+
+            expected = '[LightInfantry] (alive) POS=1 HEA=20 ATT=1 DEF=1 ACT=1\n[LightInfantry] (alive) POS=2 HEA=20 ATT=1 DEF=1 ACT=1\n';
+            assert.equal(unitFormation.toString(), expected);
+        });
 
     });
 

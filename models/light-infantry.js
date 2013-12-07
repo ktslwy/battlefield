@@ -23,8 +23,6 @@ LightInfantry.baseStats = {
 
 LightInfantry.prototype = new BaseUnit();
 
-LightInfantry.prototype.toString = function() {
-    return '[LightInfantry]';
-};
+LightInfantry.prototype.name = 'LightInfantry';
 
 module.exports = LightInfantry;

@@ -5,7 +5,7 @@
     "author": "Lawrence Lau <ktslwy@gmail.com>",
     "main": "index.js",
     "scripts": {
-        "test": "istanbul cover --dir coverage ./node_modules/.bin/_mocha test/unit/ -- --recursive --reporter tap --timeout 10000"
+        "test": "istanbul cover --dir coverage ./node_modules/.bin/_mocha test/unit/ -- --recursive --reporter tap --timeout 2000"
     },
     "repository": {
         "type": "git",
