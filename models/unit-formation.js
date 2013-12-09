@@ -64,4 +64,17 @@ UnitFormation.prototype.toString = function() {
     return string;
 };
 
+UnitFormation.prototype.getData = function() {
+    var self = this,
+        formationData;
+    
+    formationData = self.formation.map(function(unit){
+        return unit.getData();
+    });
+
+    return {
+        formation: formationData
+    };
+};
+
 module.exports = UnitFormation;

@@ -18,6 +18,10 @@ BaseUnit.prototype.position = null;
 
 BaseUnit.prototype.status = BaseUnit.STATUS_ALIVE;
 
+BaseUnit.prototype.stats = null;
+
+BaseUnit.prototype.name = null;
+
 BaseUnit.prototype.isAlive = function() {
     return this.status === BaseUnit.STATUS_ALIVE;
 };
@@ -72,6 +76,18 @@ BaseUnit.prototype.toString = function() {
     }
 
     return string;
+};
+
+BaseUnit.prototype.getData = function() {
+    var self = this;
+
+    return {
+        side        : self.side,
+        position    : self.position,
+        status      : self.status,
+        stats       : _.clone(self.stats),
+        name        : self.name
+    };
 };
 
 module.exports = BaseUnit;

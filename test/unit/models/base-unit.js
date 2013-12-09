@@ -54,4 +54,18 @@ describe('BaseUnit', function(){
 
     });
 
+    describe('#getData()', function(){
+
+        it('should return an object that is not altered by changes to original object', function(){
+            var lightInfantry   = new LightInfantry(),
+                data            = lightInfantry.getData(),
+                refHealthPoint = data.stats.healthPoint;
+
+            assert.isDefined(refHealthPoint);
+            lightInfantry.stats.healthPoint = 10;
+            assert.equal(data.stats.healthPoint, refHealthPoint);
+        });
+
+    });
+
 });
