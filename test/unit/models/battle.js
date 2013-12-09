@@ -109,11 +109,11 @@ describe('Battle', function(){
                     return BaseUnit.SIDE_RIGHT;
                 }
                 executeCount++;
-            }
+            };
 
             battle.nextRound = function(){
                 assert.notEqual(executeCount, 2);
-            }
+            };
 
             battle.start();
 

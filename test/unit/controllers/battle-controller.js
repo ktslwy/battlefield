@@ -1,5 +1,5 @@
 var assert              = require('chai').assert,
-    Battle              = require('../../../models/battle');
+    Battle              = require('../../../models/battle'),
     BattleController    = require('../../../controllers/battle-controller');
 
 describe('BattleController', function(){

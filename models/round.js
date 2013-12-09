@@ -63,7 +63,7 @@ Round.prototype._getState = function() {
     return {
         leftFormation: self.leftFormation.getData(),
         rightFormation: self.rightFormation.getData()
-    }
+    };
 };
 
 Round.prototype._finalize = function() {

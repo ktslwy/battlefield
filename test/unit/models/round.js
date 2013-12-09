@@ -49,7 +49,7 @@ describe('Round', function(){
                 i += allLiFormation.length;
                 assert.isTrue(units[i] instanceof HeavyInfantry);
                 assert.equal(units[i].position, unit.position);
-            })
+            });
         });
 
     });
@@ -77,7 +77,7 @@ describe('Round', function(){
                 i += allLiFormation.length;
                 assert.isTrue(units[i] instanceof HeavyInfantry);
                 assert.equal(units[i].position, unit.position);
-            })
+            });
         });
 
         it('should return filtered units based on actionInterval and unit status', function(){
