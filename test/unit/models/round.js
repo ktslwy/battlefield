@@ -1,8 +1,8 @@
 var assert          = require('chai').assert,
     Round          = require('../../../models/round'),
     UnitFormation   = require('../../../models/unit-formation'),
-    allLiFormation  = require('../../../samples/formation/all-li'),
-    allHiFormation  = require('../../../samples/formation/all-hi'),
+    allLiFormation  = require('../../../samples/formation/li-li'),
+    allHiFormation  = require('../../../samples/formation/hi-hi'),
     LightInfantry   = require('../../../models/light-infantry'),
     HeavyInfantry   = require('../../../models/heavy-infantry'),
     BaseUnit        = require('../../../models/base-unit');

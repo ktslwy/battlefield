@@ -1,8 +1,8 @@
 var assert          = require('chai').assert,
     Battle          = require('../../../models/battle'),
     UnitFormation   = require('../../../models/unit-formation'),
-    allLiFormation  = require('../../../samples/formation/all-li'),
-    allHiFormation  = require('../../../samples/formation/all-hi'),
+    allLiFormation  = require('../../../samples/formation/li-li'),
+    allHiFormation  = require('../../../samples/formation/hi-hi'),
     BaseUnit        = require('../../../models/base-unit');
 
 function getBattleConfigWithFormations() {
