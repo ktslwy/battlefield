@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "description": "Battlefield",
     "author": "Lawrence Lau <ktslwy@gmail.com>",
-    "main": "index.js",
+    "main": "app.js",
     "scripts": {
         "test": "istanbul cover --dir coverage ./node_modules/.bin/_mocha test/unit/ -- --recursive --reporter tap --timeout 2000"
     },
@@ -23,7 +23,8 @@
         "istanbul": "~0.1.42",
         "grunt": "~0.4.2",
         "grunt-contrib-jshint": "~0.7.2",
-        "grunt-contrib-watch": "~0.5.3"
+        "grunt-contrib-watch": "~0.5.3",
+        "express": "~3.4.7"
     },
     "engines": {
         "node": ">=0.10"

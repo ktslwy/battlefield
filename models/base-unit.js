@@ -42,15 +42,17 @@ BaseUnit.prototype.attack = function(targetUnit) {
     var self = this,
         damage = self._computeDamage();
 
-    targetUnit._takeDamage(damage);
+    return targetUnit._takeDamage(damage);
 };
 
 BaseUnit.prototype._takeDamage = function(grossDamage) {
-    var self = this,
-        defended = self.stats.defense,
+    var self        = this,
+        healthPoint = self.stats.healthPoint,
+        defended    = self.stats.defense,
+        damage      = grossDamage > healthPoint ? healthPoint : grossDamage,
         newHealthPoint;
 
-    newHealthPoint = self.stats.healthPoint - grossDamage;
+    newHealthPoint = healthPoint - damage;
 
     if (newHealthPoint > 0) {
         self.stats.healthPoint = newHealthPoint;
@@ -58,6 +60,8 @@ BaseUnit.prototype._takeDamage = function(grossDamage) {
         self.stats.healthPoint = 0;
         self._die();
     }
+
+    return damage;
 };
 
 BaseUnit.prototype._die = function() {

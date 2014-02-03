@@ -7,39 +7,55 @@ function Battle(config) {
     var self = this;
 
     if (config) {
-        self.leftFormation  = config.leftFormation;
-        self.rightFormation = config.rightFormation;
+        self._leftFormation  = config.leftFormation;
+        self._rightFormation = config.rightFormation;
     }
 
-    if (self.leftFormation) {
-        self.leftFormation.setSide(BaseUnit.SIDE_LEFT);
+    if (self._leftFormation) {
+        self._leftFormation.setSide(BaseUnit.SIDE_LEFT);
     }
 
-    if (self.rightFormation) {
-        self.rightFormation.setSide(BaseUnit.SIDE_RIGHT);
+    if (self._rightFormation) {
+        self._rightFormation.setSide(BaseUnit.SIDE_RIGHT);
     }
 }
 
 Battle.prototype.currentRoundNumber = 0;
 
-Battle.prototype.leftFormation = null;
+Battle.prototype.startState = null;
 
-Battle.prototype.rightFormation = null;
+Battle.prototype.endState = null;
 
-Battle.prototype._winningSide = null;
+Battle.prototype._leftFormation = null;
 
-Battle.prototype._rounds = null;
+Battle.prototype._rightFormation = null;
+
+Battle.prototype.winningSide = null;
+
+Battle.prototype.rounds = null;
 
 Battle.prototype.start = function() {
     var self = this;
 
-    if (!self._rounds) {
-        self._rounds = [];
+    self.startState = {
+        leftFormation: self._leftFormation.getData(),
+        rightFormation: self._rightFormation.getData()
+    };
+
+    if (!self.rounds) {
+        self.rounds = [];
     }
 
     while (!self._getWinningSide()) {
         self.nextRound();
     }
+
+    self.endState = {
+        leftFormation: self._leftFormation.getData(),
+        rightFormation: self._rightFormation.getData()
+    };
+
+    self._finalize();
 };
 
 Battle.prototype.nextRound = function() {
@@ -56,12 +72,6 @@ Battle.prototype.nextRound = function() {
     round = self._createNextRound();
     round.setupQueue();
     round.executeQueue();
-
-    console.log('\nRound ', self.currentRoundNumber);
-    console.log('LEFT  :');
-    console.log(self.leftFormation.toString());
-    console.log('RIGHT :');
-    console.log(self.rightFormation.toString());
 };
 
 Battle.prototype._createNextRound = function() {
@@ -70,12 +80,12 @@ Battle.prototype._createNextRound = function() {
 
     round = new Round({
         roundNumber: self.currentRoundNumber,
-        leftFormation: self.leftFormation,
-        rightFormation: self.rightFormation
+        leftFormation: self._leftFormation,
+        rightFormation: self._rightFormation
     });
 
-    if (self._rounds) {
-        self._rounds.push(round);
+    if (self.rounds) {
+        self.rounds.push(round);
     }
 
     return round;
@@ -86,24 +96,31 @@ Battle.prototype._getWinningSide = function() {
         isLeftAlive,
         isRightAlive;
 
-    if (self._winningSide) {
-        return self._winningSide;
+    if (self.winningSide) {
+        return self.winningSide;
     }
 
-    isLeftAlive  = self.leftFormation.areSomeAlive();
-    isRightAlive = self.rightFormation.areSomeAlive();
+    isLeftAlive  = self._leftFormation.areSomeAlive();
+    isRightAlive = self._rightFormation.areSomeAlive();
 
     if (isLeftAlive && isRightAlive) {
         return null;
     }
 
     if (isLeftAlive) {
-        self._winningSide = BaseUnit.SIDE_LEFT;
+        self.winningSide = BaseUnit.SIDE_LEFT;
     } else if (isRightAlive) {
-        self._winningSide = BaseUnit.SIDE_RIGHT;
+        self.winningSide = BaseUnit.SIDE_RIGHT;
     }
 
-    return self._winningSide;
+    return self.winningSide;
+};
+
+Battle.prototype._finalize = function() {
+    var self = this;
+
+    delete self._leftFormation;
+    delete self._rightFormation;
 };
 
 module.exports = Battle;

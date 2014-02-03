@@ -20,8 +20,8 @@ describe('Round', function(){
 
     beforeEach(function(){
         round = new Round(getRoundConfigWithFormations());
-        round.leftFormation.setSide(BaseUnit.SIDE_LEFT);
-        round.rightFormation.setSide(BaseUnit.SIDE_RIGHT);
+        round._leftFormation.setSide(BaseUnit.SIDE_LEFT);
+        round._rightFormation.setSide(BaseUnit.SIDE_RIGHT);
     });
 
     it('should instantiate without config', function(){
@@ -31,8 +31,8 @@ describe('Round', function(){
 
     it('should instantiate with config', function(){
         assert.isTrue(round instanceof Round);
-        assert.isTrue(round.leftFormation instanceof UnitFormation);
-        assert.isTrue(round.rightFormation instanceof UnitFormation);
+        assert.isTrue(round._leftFormation instanceof UnitFormation);
+        assert.isTrue(round._rightFormation instanceof UnitFormation);
     });
 
     describe('#_getAllUnits()', function(){
@@ -83,7 +83,7 @@ describe('Round', function(){
         it('should return filtered units based on actionInterval and unit status', function(){
             var units;
 
-            round.leftFormation.formation.forEach(function(unit){
+            round._leftFormation.formation.forEach(function(unit){
                 unit._die();
             });
             units = round._getRoundUnits();
@@ -175,8 +175,8 @@ describe('Round', function(){
             round.setupQueue();
             round.executeQueue();
 
-            assert.isNull(round.leftFormation);
-            assert.isNull(round.rightFormation);
+            assert.isNull(round._leftFormation);
+            assert.isNull(round._rightFormation);
         });
 
     });
@@ -187,13 +187,37 @@ describe('Round', function(){
             var state = round._getState(),
                 refHealthPoint;
 
-            round.leftFormation.formation[1] = null;
+            round._leftFormation.formation[1] = null;
             assert.isNotNull(state.leftFormation.formation[1]);
 
             refHealthPoint = state.rightFormation.formation[2].stats.healthPoint;
             assert.isDefined(refHealthPoint);
-            round.rightFormation.formation[2].stats.healthPoint = 10;
+            round._rightFormation.formation[2].stats.healthPoint = 10;
             assert.equal(state.rightFormation.formation[2].stats.healthPoint, refHealthPoint);
+        });
+
+    });
+
+    describe('#_recordAction()', function(){
+
+        it('should add action to the action array', function(){
+            var sourceUnit  = {position: 7, side: BaseUnit.SIDE_LEFT},
+                targetUnit  = {position: 1, side: BaseUnit.SIDE_RIGHT},
+                damage      = 6,
+                action;
+
+            round.actions = [];
+            round._recordAction(sourceUnit, targetUnit, damage);
+
+            assert.equal(round.actions.length, 1);
+
+            action = round.actions[0];
+
+            assert.equal(action.source.position, sourceUnit.position);
+            assert.equal(action.source.side, sourceUnit.side);
+            assert.equal(action.target.position, targetUnit.position);
+            assert.equal(action.target.side, targetUnit.side);
+            assert.equal(action.effects[0].change, -6);
         });
 
     });

@@ -9,16 +9,16 @@ function Round(config) {
 
     if (config) {
         self.roundNumber = config.roundNumber;
-        self.leftFormation = config.leftFormation;
-        self.rightFormation = config.rightFormation;
+        self._leftFormation = config.leftFormation;
+        self._rightFormation = config.rightFormation;
     }
 }
 
 Round.prototype.roundNumber = 0;
 
-Round.prototype.leftFormation = null;
+Round.prototype._leftFormation = null;
 
-Round.prototype.rightFormation = null;
+Round.prototype._rightFormation = null;
 
 Round.prototype.startState = null;
 
@@ -27,6 +27,8 @@ Round.prototype.endState = null;
 Round.prototype._allUnits = null;
 
 Round.prototype._queue = null;
+
+Round.prototype.actions = null;
 
 Round.prototype.setupQueue = function() {
     var self    = this,
@@ -40,16 +42,19 @@ Round.prototype.executeQueue = function() {
         queue = self._queue;
 
     self.startState = self._getState();
+    self.actions = [];
 
     queue.forEach(function(unit){
         if (!unit.isAlive()) {
             return;
         }
 
-        var targetUnit = self._getTargetUnit(unit);
+        var targetUnit = self._getTargetUnit(unit),
+            damage;
 
         if (targetUnit) {
-            unit.attack(targetUnit);
+            damage = unit.attack(targetUnit);
+            self._recordAction(unit, targetUnit, damage);
         }
     });
 
@@ -61,16 +66,18 @@ Round.prototype._getState = function() {
     var self = this;
 
     return {
-        leftFormation: self.leftFormation.getData(),
-        rightFormation: self.rightFormation.getData()
+        leftFormation: self._leftFormation.getData(),
+        rightFormation: self._rightFormation.getData()
     };
 };
 
 Round.prototype._finalize = function() {
     var self = this;
 
-    self.leftFormation = null;
-    self.rightFormation = null;
+    delete self._leftFormation;
+    delete self._rightFormation;
+    delete self._allUnits;
+    delete self._queue;
 };
 
 Round.prototype._getRoundUnits = function() {
@@ -87,7 +94,7 @@ Round.prototype._getAllUnits = function() {
     var self = this;
 
     if (!self._allUnits) {
-        self._allUnits = self.leftFormation.formation.concat(self.rightFormation.formation);
+        self._allUnits = self._leftFormation.formation.concat(self._rightFormation.formation);
     }
 
     return self._allUnits;
@@ -100,7 +107,7 @@ Round.prototype._getTargetUnit = function (unit) {
         unitRow         = Math.floor((unitPosition - 1) / 5),
         targetPositions = positionMap[unitSide][unitRow],
         targetSide      = unitSide === BaseUnit.SIDE_LEFT ? BaseUnit.SIDE_RIGHT : BaseUnit.SIDE_LEFT,
-        targetFormation = targetSide === BaseUnit.SIDE_LEFT ? self.leftFormation : self.rightFormation,
+        targetFormation = targetSide === BaseUnit.SIDE_LEFT ? self._leftFormation : self._rightFormation,
         targetUnit;
 
     targetPositions.some(function(position){
@@ -113,6 +120,25 @@ Round.prototype._getTargetUnit = function (unit) {
     });
 
     return targetUnit;
+};
+
+Round.prototype._recordAction = function(unit, targetUnit, damage) {
+    var self = this;
+
+    self.actions.push({
+        source: {
+            position:   unit.position,
+            side:       unit.side
+        },
+        target: {
+            position:   targetUnit.position,
+            side:       targetUnit.side
+        },
+        effects: [{
+            attribute:  'healthPoint',
+            change:     -damage
+        }]
+    });
 };
 
 module.exports = Round;

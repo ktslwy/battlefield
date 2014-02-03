@@ -26,10 +26,10 @@ describe('Battle', function(){
 
     it('should instantiate with config', function(){
         assert.isTrue(battle instanceof Battle);
-        battle.leftFormation.formation.forEach(function(unit){
+        battle._leftFormation.formation.forEach(function(unit){
             assert.equal(unit.side, BaseUnit.SIDE_LEFT);
         });
-        battle.rightFormation.formation.forEach(function(unit){
+        battle._rightFormation.formation.forEach(function(unit){
             assert.equal(unit.side, BaseUnit.SIDE_RIGHT);
         });
     });
@@ -43,10 +43,10 @@ describe('Battle', function(){
         });
 
         it('should return null if both formations are dead', function(){
-            battle.leftFormation.formation.forEach(function(unit){
+            battle._leftFormation.formation.forEach(function(unit){
                 unit._die();
             });
-            battle.rightFormation.formation.forEach(function(unit){
+            battle._rightFormation.formation.forEach(function(unit){
                 unit._die();
             });
 
@@ -58,34 +58,34 @@ describe('Battle', function(){
         it('should return the left side if the right side is not alive', function(){
             var winningSide;
 
-            battle.leftFormation.formation.forEach(function(unit){
+            battle._leftFormation.formation.forEach(function(unit){
                 unit._die();
             });
             winningSide = battle._getWinningSide();
 
             assert.equal(winningSide, BaseUnit.SIDE_RIGHT);
-            assert.equal(battle._winningSide, winningSide);
+            assert.equal(battle.winningSide, winningSide);
         });
 
         it('should return the right side if the left side is not alive', function(){
             var winningSide;
 
-            battle.rightFormation.formation.forEach(function(unit){
+            battle._rightFormation.formation.forEach(function(unit){
                 unit._die();
             });
             winningSide = battle._getWinningSide();
 
             assert.equal(winningSide, BaseUnit.SIDE_LEFT);
-            assert.equal(battle._winningSide, winningSide);
+            assert.equal(battle.winningSide, winningSide);
         });
 
         it('should return the cached value that is computed before', function(){
             var winningSide;
 
-            battle._winningSide = BaseUnit.SIDE_LEFT;
+            battle.winningSide = BaseUnit.SIDE_LEFT;
             winningSide = battle._getWinningSide();
 
-            assert.equal(winningSide, battle._winningSide);
+            assert.equal(winningSide, battle.winningSide);
         });
 
     });
@@ -93,7 +93,7 @@ describe('Battle', function(){
     describe('#start()', function(){
 
         it('should exit immediately if winning side has been determined', function(){
-            battle.rightFormation.formation.forEach(function(unit){
+            battle._rightFormation.formation.forEach(function(unit){
                 unit._die();
             });
 
@@ -120,8 +120,8 @@ describe('Battle', function(){
             setTimeout(done, 300);
         });
 
-        it('should not init _rounds if already inited', function(){
-            battle._rounds = [1];
+        it('should not init rounds if already inited', function(){
+            battle.rounds = [1];
 
             battle._getWinningSide = function(){
                 return BaseUnit.SIDE_RIGHT;
@@ -129,7 +129,7 @@ describe('Battle', function(){
 
             battle.start();
 
-            assert.equal(battle._rounds[0], 1);
+            assert.equal(battle.rounds[0], 1);
         });
 
     });
@@ -148,13 +148,27 @@ describe('Battle', function(){
         });
 
         it('should increment round number', function(){
-            var currentRoundNumber       = battle.currentRoundNumber,
-                consoleLog  = console.log;
+            var currentRoundNumber = battle.currentRoundNumber;
 
-            console.log = function(){};
             battle.nextRound();
-            console.log = consoleLog;
             assert.equal(battle.currentRoundNumber, currentRoundNumber + 1);
+        });
+
+    });
+
+    describe('#_createNextRound()', function(){
+
+        it('should create a round and append to the rounds array', function(){
+            var round;
+
+            battle.rounds = [];
+            battle._createNextRound();
+
+            assert.equal(battle.rounds.length, 1);
+
+            round = battle.rounds[0];
+
+            assert.equal(round.roundNumber, battle.currentRoundNumber);
         });
 
     });

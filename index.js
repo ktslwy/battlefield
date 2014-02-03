@@ -4,20 +4,24 @@ var Battle           = require('./models/battle'),
     BattleController = require('./controllers/battle-controller'),
     allLiFormation   = require('./samples/formation/all-li'),
     allHiFormation   = require('./samples/formation/all-hi'),
-    UnitFormation    = require('./models/unit-formation'),
-    battle,
-    battleConfig,
-    battleController,
-    battleControllerConfig;
+    UnitFormation    = require('./models/unit-formation');
 
-battleConfig = {
-    leftFormation  : new UnitFormation({formation: allLiFormation}),
-    rightFormation : new UnitFormation({formation: allHiFormation})
-};
-battle = new Battle(battleConfig);
+module.exports = function() {
+    var battle,
+        battleController,
+        battleControllerConfig;
 
-battleControllerConfig = {
-    battle: battle
+    battle = new Battle({
+        leftFormation  : new UnitFormation({formation: allLiFormation}),
+        rightFormation : new UnitFormation({formation: allHiFormation})
+    });
+
+    battleControllerConfig = {
+        battle: battle
+    };
+
+    battleController = new BattleController(battleControllerConfig);
+    battleController.startBattle();
+
+    return battle;
 };
-battleController = new BattleController(battleControllerConfig);
-battleController.startBattle();
