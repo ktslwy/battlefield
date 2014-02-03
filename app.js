@@ -10,7 +10,7 @@ app.use(app.router);
 
 app.get('/', function(req, res){
     var index = require('./index'),
-        battle = index();
+        battle = index(req.query.left, req.query.right);
 
     res.json(battle);
 });
