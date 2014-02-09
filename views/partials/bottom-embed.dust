@@ -1,0 +1,49 @@
+<script>
+YUI().use('node', 'battlefield-spritesheets', function(Y){
+
+    var spriteSheets    = Y.Battlefield.SpriteSheets,
+        lightInfantrySS = spriteSheets.getSpriteSheet('light-infantry'),
+        heavyInfantrySS = spriteSheets.getSpriteSheet('heavy-infantry'),
+        // stage           = new createjs.Stage(Y.one('#battlefield').getDOMNode()),
+        stage           = new createjs.Stage(document.getElementById('battlefield')),
+        lightInfantry   = new createjs.Sprite(lightInfantrySS, 'stand'),
+        heavyInfantry   = new createjs.Sprite(heavyInfantrySS, 'stand');
+
+    createjs.Ticker.setFPS(12);
+    createjs.Ticker.addEventListener("tick", stage);
+    
+    lightInfantry.x = 0;
+    lightInfantry.y = 0;
+
+    stage.addChild(lightInfantry);
+
+    /////////////////////////////////
+
+    function chainAnimation(sprite, animations, options) {
+        var animation = animations.splice(0, 1),
+            listener;
+
+        options = options || {};
+
+        listener = sprite.on('animationend', function(){
+            sprite.off('animationend', listener);
+            if (animations.length > 0) {
+                chainAnimation(sprite, animations, options);
+            } else {
+                if (options.stopAtLast) {
+                    sprite.stop();
+                }
+                if (typeof options.callback === 'function') {
+                    options.callback();
+                }
+            }
+        });
+
+        sprite.gotoAndPlay(animation);
+    }
+
+    chainAnimation(lightInfantry, ['stand', 'walk', 'walk', 'walk', 'fire', 'stand'], {
+        stopAtLast : true
+    });
+});
+</script>

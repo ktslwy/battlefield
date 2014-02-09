@@ -1,0 +1,31 @@
+{^query.debug}
+<script src="http://code.createjs.com/easeljs-0.7.1.min.js"></script>
+{:else}
+<script type="text/javascript" src="/js/lib/createjs/events/Event.js"></script>
+<script type="text/javascript" src="/js/lib/createjs/events/EventDispatcher.js"></script>
+<script type="text/javascript" src="/js/lib/createjs/utils/IndexOf.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/utils/UID.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/utils/Ticker.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/geom/Matrix2D.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/geom/Point.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/geom/Rectangle.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Shadow.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/SpriteSheet.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Graphics.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/DisplayObject.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Container.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Stage.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Bitmap.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Sprite.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/BitmapAnimation.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/BitmapText.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Shape.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/Text.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/display/DOMElement.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/events/MouseEvent.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/filters/Filter.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/ui/ButtonHelper.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/ui/Touch.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/utils/SpriteSheetUtils.js"></script>
+<script type="text/javascript" src="/js/lib/easeljs/utils/SpriteSheetBuilder.js"></script>
+{/query.debug}

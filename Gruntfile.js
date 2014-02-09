@@ -1,28 +1,14 @@
-var fs      = require('fs'),
-    path    = require('path'),
-    config  = {};
-
-function extend(a, b) {
-    for (var x in b) {
-        a[x] = b[x];
-    }
-}
-
-fs.readdirSync('./grunt/configs').forEach(function (file) {
-    if (path.extname(file) === '.js') {
-        extend(config, require('./grunt/configs/' + file));
-    }
-});
-
 module.exports = function(grunt) {
+    var config = {
+        ENV : grunt.option('env') || 'dev',
+        pkg : grunt.file.readJSON('package.json')
+    };
 
-    extend(config, {
-        src: grunt.option('src') || '.'
-    });
+    config.src = grunt.option('src') || '.';
 
     grunt.initConfig(config);
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-watch');
 
-    grunt.registerTask('default', ['jshint']);
+    grunt.loadTasks('grunt');
+
+    grunt.registerTask('default', ['jshint', 'compass']);
 };

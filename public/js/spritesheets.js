@@ -1,5 +1,9 @@
+/*globals createjs*/
+
 YUI.add('battlefield-spritesheets', function (Y) {
     'use strict';
+
+    var frames, animations, spriteSheets;
 
     // fit them into the same box
     function fitFrames(frames) {
@@ -25,7 +29,7 @@ YUI.add('battlefield-spritesheets', function (Y) {
         return frames;
     }
 
-    var frames = fitFrames([
+    frames = fitFrames([
         // stand
         [ 14,  50, 64, 80], // 0
         [ 88,  50, 64, 80], // 1
@@ -59,13 +63,13 @@ YUI.add('battlefield-spritesheets', function (Y) {
         [488, 576, 106, 80]  // 25
     ]);
 
-    var animations = {
+    animations = {
         stand : [0, 5],
         walk  : [6, 17],
         fire  : { frames: [18, 19, 20, 21, 22, 23, 24, 25, 21, 20, 19, 18] }
     };
 
-    var spriteSheets = {
+    spriteSheets = {
         'light-infantry' : new createjs.SpriteSheet({
             animations: animations,
             images: ['/img/light-infantry.png'],
