@@ -2,11 +2,12 @@
 
 var express = require('express'),
     http    = require('http'),
+    path 	= require('path'),
     app     = express();
 
 app.set('port', 3000);
-
 app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res){
     var index = require('./index'),
