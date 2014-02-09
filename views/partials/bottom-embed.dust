@@ -1,5 +1,22 @@
 <script>
-YUI().use('node', 'battlefield-spritesheets', function(Y){
+yui.use('node', 'battlefield-battle', 'battlefield-assets', function(Y){
+
+    var battleStage = new createjs.Stage(Y.one('#battlefield').getDOMNode()),
+        battle = new Y.Battlefield.Battle({
+            battleStage : battleStage,
+            battleData  : {battleData|s}
+        });
+
+    createjs.Ticker.setFPS(12);
+    createjs.Ticker.addEventListener("tick", battleStage);
+
+    Y.Battlefield.Assets.loadAssets(function(){
+        battle.start();
+    });
+
+});
+/*
+yui.use('node', 'battlefield-spritesheets', function(Y){
 
     var spriteSheets    = Y.Battlefield.SpriteSheets,
         lightInfantrySS = spriteSheets.getSpriteSheet('light-infantry'),
@@ -46,4 +63,5 @@ YUI().use('node', 'battlefield-spritesheets', function(Y){
         stopAtLast : true
     });
 });
+*/
 </script>

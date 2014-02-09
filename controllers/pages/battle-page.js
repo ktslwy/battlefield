@@ -1,11 +1,13 @@
 'use strict';
 
+var index = require('../../index');
+
 module.exports = function(req, res){
-    var query = req.query,
-        index = require('../../index'),
-        battle = index(query.left, query.right);
+    var query       = req.query,
+        battleData  = index(query.left, query.right);
 
     res.render('battle', {
-        query: query
+        query: query,
+        battleData: JSON.stringify(battleData)
     });
 };

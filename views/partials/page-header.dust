@@ -4,7 +4,11 @@
 {> "partials/easeljs-asset" /}
 <script src="http://yui.yahooapis.com/3.14.1/build/yui/yui-min.js"></script>
 <script src="/js/spritesheets.js"></script>
+<script src="/js/battle.js"></script>
+<script src="/js/battle-view.js"></script>
+<script src="/js/assets.js"></script>
 <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.1/base-min.css">
 <link rel="stylesheet" href="/css/styles.css">
+<script>var yui = YUI();</script>
 </head>
 <body>
