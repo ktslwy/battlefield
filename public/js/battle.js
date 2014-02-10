@@ -3,12 +3,14 @@ YUI.add('battlefield-battle', function (Y) {
 
     function Battle(config) {
         var self = this,
-            battleStage = config.battleStage;
+            battleStage = config.battleStage,
+            battleData = config.battleData;
 
         self.config = config;
 
         self.battleView = new Y.Battlefield.BattleView({
-            battleStage: battleStage
+            battleStage: battleStage,
+            battleStartState: battleData.startState
         });
     }
 
