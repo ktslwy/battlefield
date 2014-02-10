@@ -1,5 +1,5 @@
 <script>
-yui.use('node', 'battlefield-battle', 'battlefield-assets', function(Y){
+yui.use('node', 'battlefield-spritesheets', 'battlefield-battle', 'battlefield-assets', function(Y){
 
     var battleStage = new createjs.Stage(Y.one('#battlefield').getDOMNode()),
         battle = new Y.Battlefield.Battle({
@@ -11,6 +11,7 @@ yui.use('node', 'battlefield-battle', 'battlefield-assets', function(Y){
     createjs.Ticker.addEventListener("tick", battleStage);
 
     Y.Battlefield.Assets.loadAssets(function(){
+        Y.Battlefield.SpriteSheets.loadSpriteSheets();
         battle.start();
     });
 

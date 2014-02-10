@@ -15,6 +15,28 @@ YUI.add('battlefield-battle-view', function (Y) {
 
         self._renderBackground();
         self._renderSlots();
+        self._renderSide('left');
+        self._renderSide('right');
+    };
+
+    BattleView.prototype._renderSide = function(side) {
+        var self            = this,
+            formationData   = self.config.battleStartState[side + 'Formation'],
+            slotContainers  = self.slotContainers[side],
+            sideView;
+
+        sideView = new Y.Battlefield.SideView({
+            formationData  : formationData,
+            slotContainers : slotContainers
+        });
+
+        sideView.render();
+
+        if (!self.sideViews) {
+            self.sideViews = {};
+        }
+
+        self.sideViews[side] = sideView;
     };
 
     BattleView.prototype._renderBackground = function() {
@@ -65,18 +87,20 @@ YUI.add('battlefield-battle-view', function (Y) {
             slotPositionY += slotSize.height;
         }
 
-        self.slotContainersLeft = slotContainersLeft;
-        self.slotContainersRight = slotContainersRight;
+        self.slotContainers = {
+            left  : slotContainersLeft,
+            right : slotContainersRight
+        };
     };
 
     BattleView.prototype._getSlotContainer = function(index, x, y, slotGraphic) {
-
         var slotContainer   = new createjs.Container(),
             slotShape       = new createjs.Shape(slotGraphic),
             slotIndexText   = new createjs.Text(index, 'bold 14px monospace', '#111');
 
         slotContainer.x = x;
         slotContainer.y = y;
+        slotContainer.setBounds(x, y, 100, 100);
 
         slotShape.x = 0;
         slotShape.y = 0;
@@ -91,7 +115,6 @@ YUI.add('battlefield-battle-view', function (Y) {
     };
 
     BattleView.prototype._computeSlotSpacing = function(canvas, slotSize, rows, columns) {
-
         var totalSlotHeight = rows * slotSize.height,
             totalSpacing    = canvas.height - totalSlotHeight,
             spacing         = totalSpacing / (rows + 1); // + 1 to include bottom border spacing
@@ -101,4 +124,4 @@ YUI.add('battlefield-battle-view', function (Y) {
 
     Y.namespace('Battlefield').BattleView = BattleView;
 
-}, '0.0.0', {requires: []});
+}, '0.0.0', {requires: ['battlefield-side-view']});

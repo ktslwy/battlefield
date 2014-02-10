@@ -26,6 +26,9 @@ YUI.add('battlefield-spritesheets', function (Y) {
             frame[6] = frame[3] - maxHeight;
         });
 
+        // add an init frame to store the max frame size
+        frames.push([-99999, -99999, maxWidth, maxHeight]);
+
         return frames;
     }
 
@@ -66,27 +69,29 @@ YUI.add('battlefield-spritesheets', function (Y) {
     animations = {
         stand : [0, 5],
         walk  : [6, 17],
-        fire  : { frames: [18, 19, 20, 21, 22, 23, 24, 25, 21, 20, 19, 18] }
+        fire  : { frames: [18, 19, 20, 21, 22, 23, 24, 25, 21, 20, 19, 18] },
+        init  : [frames.length - 1]
     };
 
     spriteSheets = {
-        'light-infantry' : new createjs.SpriteSheet({
-            animations: animations,
-            images: ['/img/light-infantry.png'],
-            frames: frames
-        }),
-        'heavy-infantry' : new createjs.SpriteSheet({
-            animations: animations,
-            images: ['/img/heavy-infantry.png'],
-            frames: frames
-        })
+        LightInfantry : 'lightInfantrySpriteSheet',
+        HeavyInfantry : 'heavyInfantrySpriteSheet'
     };
 
     Y.namespace('Battlefield').SpriteSheets = {
-        getSpriteSheet : function(name) {
-            if (name) {
-                return spriteSheets[name];
-            }
+
+        loadSpriteSheets : function() {
+            var assets = Y.Battlefield.Assets;
+
+            Y.each(spriteSheets, function(assetKey, spriteSheetName){
+                spriteSheets[spriteSheetName] = new createjs.SpriteSheet({
+                    animations: animations,
+                    images: [assets[assetKey]],
+                    frames: frames
+                });
+            });
+
+            Y.Battlefield.SpriteSheets = spriteSheets;
         }
     };
 
