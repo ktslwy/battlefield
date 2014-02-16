@@ -105,7 +105,7 @@ Round.prototype._getTargetUnit = function (unit) {
         unitPosition    = unit.position,
         unitSide        = unit.side,
         unitRow         = Math.floor((unitPosition - 1) / 5),
-        targetPositions = positionMap[unitSide][unitRow],
+        targetPositions = positionMap[unitRow],
         targetSide      = unitSide === BaseUnit.SIDE_LEFT ? BaseUnit.SIDE_RIGHT : BaseUnit.SIDE_LEFT,
         targetFormation = targetSide === BaseUnit.SIDE_LEFT ? self._leftFormation : self._rightFormation,
         targetUnit;

@@ -113,14 +113,14 @@ describe('Round', function(){
         it('should return target unit of regular position based on map', function(){
             var targetUnit = round._getTargetUnit({position: 7, side: BaseUnit.SIDE_LEFT});
 
-            assert.equal(targetUnit.position, 9);
+            assert.equal(targetUnit.position, 10);
             assert.equal(targetUnit.side, BaseUnit.SIDE_RIGHT);
         });
 
         it('should return target unit of top left corner based on map', function(){
             var targetUnit = round._getTargetUnit({position: 1, side: BaseUnit.SIDE_LEFT});
 
-            assert.equal(targetUnit.position, 4);
+            assert.equal(targetUnit.position, 5);
             assert.equal(targetUnit.side, BaseUnit.SIDE_RIGHT);
         });
 

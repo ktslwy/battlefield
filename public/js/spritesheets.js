@@ -3,14 +3,14 @@
 YUI.add('battlefield-spritesheets', function (Y) {
     'use strict';
 
-    var frames, animations, spriteSheets;
+    var leftFrames, rightFrames, animations, spriteSheets;
 
     // fit them into the same box
     function fitFrames(frames) {
         var maxHeight = 0,
             maxWidth = 0;
 
-        frames.forEach(function(frame){
+        Y.each(frames, function(frame){
             if (frame[2] > maxWidth) {
                 maxWidth = frame[2];
             }
@@ -20,7 +20,7 @@ YUI.add('battlefield-spritesheets', function (Y) {
         });
 
         // set the regX regY so they fit into the same box
-        frames.forEach(function(frame){
+        Y.each(frames, function(frame){
             frame[4] = 0; // set default image index
             frame[5] = frame[2] - maxWidth;
             frame[6] = frame[3] - maxHeight;
@@ -32,7 +32,27 @@ YUI.add('battlefield-spritesheets', function (Y) {
         return frames;
     }
 
-    frames = fitFrames([
+    function flipHorizontal(frames, sheetWidth) {
+        var flippedFrames = Y.Array.map(frames, function(frame){
+            var flippedFrame = [
+                sheetWidth - frame[0] - frame[2],
+                frame[1],
+                frame[2],
+                frame[3],
+                0,
+                0,
+                frame[6]
+            ];
+
+            return flippedFrame;
+        });
+
+        return flippedFrames;
+    }
+
+    leftFrames = fitFrames([
+        // [x, y, width, height]
+
         // stand
         [ 14,  50, 64, 80], // 0
         [ 88,  50, 64, 80], // 1
@@ -66,16 +86,18 @@ YUI.add('battlefield-spritesheets', function (Y) {
         [488, 576, 106, 80]  // 25
     ]);
 
+    rightFrames = flipHorizontal(leftFrames, 992);
+
     animations = {
         stand : [0, 5],
         walk  : [6, 17],
         fire  : { frames: [18, 19, 20, 21, 22, 23, 24, 25, 21, 20, 19, 18] },
-        init  : [frames.length - 1]
+        init  : [leftFrames.length - 1]
     };
 
     spriteSheets = {
-        LightInfantry : 'lightInfantrySpriteSheet',
-        HeavyInfantry : 'heavyInfantrySpriteSheet'
+        LightInfantry : 'LightInfantry',
+        HeavyInfantry : 'HeavyInfantry'
     };
 
     Y.namespace('Battlefield').SpriteSheets = {
@@ -84,15 +106,22 @@ YUI.add('battlefield-spritesheets', function (Y) {
             var assets = Y.Battlefield.Assets;
 
             Y.each(spriteSheets, function(assetKey, spriteSheetName){
-                spriteSheets[spriteSheetName] = new createjs.SpriteSheet({
-                    animations: animations,
-                    images: [assets[assetKey]],
-                    frames: frames
-                });
+                spriteSheets[spriteSheetName] = {
+                    left: new createjs.SpriteSheet({
+                        animations: animations,
+                        images: [assets[assetKey + 'LeftSpriteSheet']],
+                        frames: leftFrames
+                    }),
+                    right: new createjs.SpriteSheet({
+                        animations: animations,
+                        images: [assets[assetKey+ 'RightSpriteSheet']],
+                        frames: rightFrames
+                    })
+                };
             });
 
             Y.Battlefield.SpriteSheets = spriteSheets;
         }
     };
 
-}, '0.0.0', {requires: []});
+}, '0.0.0', {requires: ['array-extras']});

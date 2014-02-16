@@ -48,7 +48,7 @@ YUI.add('battlefield-battle-view', function (Y) {
 
         backgroundShape.x = 0;
         backgroundShape.y = 0;
-        backgroundShape.graphics.beginBitmapFill(assets.backgroundTexture,'repeat').drawRect(0, 0, canvas.width, canvas.height);
+        backgroundShape.graphics.beginBitmapFill(assets.BackgroundTexture,'repeat').drawRect(0, 0, canvas.width, canvas.height);
         battleStage.addChild(backgroundShape);
 
         self.backgroundShape = backgroundShape;

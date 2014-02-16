@@ -5,9 +5,11 @@ YUI.add('battlefield-assets', function (Y) {
     'use strict';
 
     var assets = {
-        backgroundTexture           : '/img/background-texture.png',
-        lightInfantrySpriteSheet    : '/img/light-infantry.png',
-        heavyInfantrySpriteSheet    : '/img/heavy-infantry.png',
+        BackgroundTexture               : '/img/background-texture.png',
+        LightInfantryLeftSpriteSheet    : '/img/light-infantry-left.png',
+        LightInfantryRightSpriteSheet   : '/img/light-infantry-right.png',
+        HeavyInfantryLeftSpriteSheet    : '/img/heavy-infantry-left.png',
+        HeavyInfantryRightSpriteSheet   : '/img/heavy-infantry-right.png',
     };
 
     function areAllAssetsLoaded() {
