@@ -17,7 +17,27 @@ YUI.add('battlefield-battle', function (Y) {
     Battle.prototype.start = function() {
         var self = this;
 
-        self.battleView.render();
+        self.battleView.render(function(){
+            self._executeRound();
+        });
+    };
+
+    Battle.prototype._executeRound = function(roundNumber) {
+        roundNumber = roundNumber || 1;
+
+        var self        = this,
+            battleView  = self.battleView,
+            battleData  = self.config.battleData,
+            roundData   = battleData.rounds[roundNumber-1];
+
+        if (!roundData) {
+            return;
+        }
+
+        battleView.renderRound(roundData, function(){
+            console.log('finished rendering round ' + roundNumber);
+            self._executeRound(roundNumber + 1);
+        });
     };
 
     Y.namespace('Battlefield').Battle = Battle;

@@ -10,16 +10,29 @@ YUI.add('battlefield-battle-view', function (Y) {
         self.config = config;
     }
 
-    BattleView.prototype.render = function() {
-        var self = this;
+    BattleView.prototype.render = function(callback) {
+        var self = this,
+            isLeftRendered,
+            isRightRendered;
+
+        function handleRendered(side) {
+            if (side === 'left') {
+                isLeftRendered = true;
+            } else if (side === 'right') {
+                isRightRendered = true;
+            }
+            if (isLeftRendered && isRightRendered) {
+                callback();
+            }
+        }
 
         self._renderBackground();
         self._renderSlots();
-        self._renderSide('left');
-        self._renderSide('right');
+        self._renderSide('left', handleRendered);
+        self._renderSide('right', handleRendered);
     };
 
-    BattleView.prototype._renderSide = function(side) {
+    BattleView.prototype._renderSide = function(side, callback) {
         var self            = this,
             formationData   = self.config.battleStartState[side + 'Formation'],
             slotContainers  = self.slotContainers[side],
@@ -30,7 +43,7 @@ YUI.add('battlefield-battle-view', function (Y) {
             slotContainers : slotContainers
         });
 
-        sideView.render();
+        sideView.render(callback.bind(self, side));
 
         if (!self.sideViews) {
             self.sideViews = {};
@@ -105,6 +118,7 @@ YUI.add('battlefield-battle-view', function (Y) {
         slotShape.x = 0;
         slotShape.y = 0;
         slotShape.alpha = 0.25;
+        slotShape.name = 'background';
         slotContainer.addChild(slotShape);
 
         slotIndexText.x = 5;
@@ -120,6 +134,36 @@ YUI.add('battlefield-battle-view', function (Y) {
             spacing         = totalSpacing / (rows + 1); // + 1 to include bottom border spacing
 
         return spacing;
+    };
+
+    BattleView.prototype.renderRound = function(roundData, callback) {
+        var self = this,
+            actions = Y.clone(roundData.actions);
+
+        self._renderActions(actions, callback);
+    };
+
+    BattleView.prototype._renderActions = function(actions, callback) {
+        var self     = this,
+            action   = actions.splice(0, 1)[0],
+            source   = action && action.source,
+            target   = action && action.target,
+            rendered = {};
+
+        if (!action) {
+            callback();
+            return;
+        }
+
+        function handleRendered(role) {
+            rendered[role] = true;
+            if (rendered.source && rendered.target) {
+                self._renderActions(actions, callback);
+            }
+        }
+
+        self.sideViews[source.side].renderAction({ role: 'source', action: action }, handleRendered.bind(self, 'source'));
+        self.sideViews[target.side].renderAction({ role: 'target', action: action }, handleRendered.bind(self, 'target'));
     };
 
     Y.namespace('Battlefield').BattleView = BattleView;
