@@ -4,9 +4,9 @@
 YUI.add('battlefield-unit-view', function (Y) {
     'use strict';
 
-    var fullRedFilter = new createjs.ColorFilter(1, 0.5, 0.5, 1),
-        halfRedFilter = new createjs.ColorFilter(1, 0, 0, 1),
-        darkFilter    = new createjs.ColorFilter(0.2, 0, 0, 1);
+    var fullRedFilter   = new createjs.ColorFilter(1, 0.5, 0.5, 1),
+        halfRedFilter   = new createjs.ColorFilter(1, 0, 0, 1),
+        darkFilter      = new createjs.ColorFilter(0.2, 0, 0, 1);
 
     function getOppositeSide(side) {
         if (side === 'left') {
@@ -60,7 +60,7 @@ YUI.add('battlefield-unit-view', function (Y) {
             slotContainer   = self.config.slotContainer,
             slotBounds      = slotContainer.getBounds(),
             hpValue         = unitData.stats.healthPoint,
-            hpText          = new createjs.Text(hpValue + '/' + hpValue, 'bold 14px monospace', '#66FF66'),
+            hpText          = new createjs.Text(hpValue + '/' + hpValue, 'normal 10px monospace', '#66FF66'),
             hpTextBounds    = hpText.getBounds();
 
         hpText.x = slotBounds.width - hpTextBounds.width - 5;
@@ -100,6 +100,7 @@ YUI.add('battlefield-unit-view', function (Y) {
             hpText          = self.hpText,
             unitData        = self.config.unitData,
             unitSprite      = self.unitSprite,
+            slotBackground  = self.config.slotContainer.getChildByName('background'),
             hpValue;
 
         unitData.stats.healthPoint += effect.change;
@@ -107,8 +108,8 @@ YUI.add('battlefield-unit-view', function (Y) {
         hpText.text = hpText.text.replace(/^\s?\d+/, hpValue < 10 ? (' ' + hpValue) : hpValue);
         self._renderDamage(null, function(){
             if (hpValue === 0) {
-                self.config.slotContainer.getChildByName('background').filters = [darkFilter];
-                self.config.slotContainer.getChildByName('background').updateCache();
+                slotBackground.filters = [darkFilter];
+                slotBackground.updateCache();
                 unitSprite.stop();
             }
             callback();

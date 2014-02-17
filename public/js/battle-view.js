@@ -76,7 +76,7 @@ YUI.add('battlefield-battle-view', function (Y) {
             slotContainersRight = [],
             rows                = 5,
             columns             = 5,
-            slotSize            = { width: 100, height: 100 },
+            slotSize            = { width: 80, height: 75 },
             spacing             = self._computeSlotSpacing(canvas, slotSize, rows, columns),
             slotPositionX       = 0,
             slotPositionY       = 0,
@@ -109,11 +109,11 @@ YUI.add('battlefield-battle-view', function (Y) {
     BattleView.prototype._getSlotContainer = function(index, x, y, slotGraphic) {
         var slotContainer   = new createjs.Container(),
             slotShape       = new createjs.Shape(slotGraphic),
-            slotIndexText   = new createjs.Text(index, 'bold 14px monospace', '#111');
+            slotIndexText   = new createjs.Text(index, 'bold 11px monospace', '#000');
 
         slotContainer.x = x;
         slotContainer.y = y;
-        slotContainer.setBounds(x, y, 100, 100);
+        slotContainer.setBounds(x, y, 80, 75);
 
         slotShape.x = 0;
         slotShape.y = 0;

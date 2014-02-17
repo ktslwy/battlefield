@@ -1,6 +1,6 @@
 {> "partials/page-header" /}
 
-<canvas id="battlefield" width="1200" height="530"></canvas>
+<canvas id="battlefield" width="900" height="405"></canvas>
 
 {> "partials/bottom-embed" /}
 
