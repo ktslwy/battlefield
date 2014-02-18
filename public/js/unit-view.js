@@ -100,7 +100,7 @@ YUI.add('battlefield-unit-view', function (Y) {
             hpText          = self.hpText,
             unitData        = self.config.unitData,
             unitSprite      = self.unitSprite,
-            slotBackground  = self.config.slotContainer.getChildByName('background'),
+            slotContainer   = self.config.slotContainer,
             hpValue;
 
         unitData.stats.healthPoint += effect.change;
@@ -108,8 +108,7 @@ YUI.add('battlefield-unit-view', function (Y) {
         hpText.text = hpText.text.replace(/^\s?\d+/, hpValue < 10 ? (' ' + hpValue) : hpValue);
         self._renderDamage(null, function(){
             if (hpValue === 0) {
-                slotBackground.filters = [darkFilter];
-                slotBackground.updateCache();
+                slotContainer.visible = false;
                 unitSprite.stop();
             }
             callback();
