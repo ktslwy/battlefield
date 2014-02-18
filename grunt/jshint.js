@@ -33,13 +33,18 @@ module.exports = function (grunt) {
                 beforeEach: true
             }
         },
+        client: {
+            files: {
+                src: ['public/js/*.js']
+            }
+        },
         server: {
             options: {
                 node: true,
                 strict: false
             },
             files: {
-                src: ['{controllers,lib,models}/**/*.js', 'public/js/*.js', 'app.js', 'index.js', 'package.json']
+                src: ['{controllers,lib,models}/**/*.js', 'app.js', 'index.js', 'package.json']
             }
         },
         dev: {

@@ -76,7 +76,7 @@ YUI.add('battlefield-battle-view', function (Y) {
             slotContainersRight = [],
             rows                = 5,
             columns             = 5,
-            slotSize            = { width: 80, height: 75 },
+            slotSize            = { width: 75, height: 75 },
             spacing             = self._computeSlotSpacing(canvas, slotSize, rows, columns),
             slotPositionX       = 0,
             slotPositionY       = 0,
@@ -113,7 +113,7 @@ YUI.add('battlefield-battle-view', function (Y) {
 
         slotContainer.x = x;
         slotContainer.y = y;
-        slotContainer.setBounds(x, y, 80, 75);
+        slotContainer.setBounds(x, y, 75, 75);
 
         slotShape.x = 0;
         slotShape.y = 0;
@@ -137,35 +137,82 @@ YUI.add('battlefield-battle-view', function (Y) {
     };
 
     BattleView.prototype.renderRound = function(roundData, callback) {
-        var self = this,
-            actions = Y.clone(roundData.actions);
+        var self        = this,
+            actions     = Y.clone(roundData.actions),
+            actionQueue = self._createActionsRenderQueue(actions, callback);
 
-        self._renderActions(actions, callback);
+        actionQueue.run();
     };
 
-    BattleView.prototype._renderActions = function(actions, callback) {
-        var self     = this,
-            action   = actions.splice(0, 1)[0],
-            source   = action && action.source,
-            target   = action && action.target,
-            rendered = {};
+    BattleView.prototype._createActionsRenderQueue = function(actions, callback) {
+        var self        = this,
+            rendering   = {},
+            actionQueue = new Y.AsyncQueue(),
+            toRender    = null,
+            waitForEverything = false;
 
-        if (!action) {
-            callback();
-            return;
-        }
+        function handleRendered(id) {
+            delete rendering[id];
 
-        function handleRendered(role) {
-            rendered[role] = true;
-            if (rendered.source && rendered.target) {
-                self._renderActions(actions, callback);
+            var isBlockingToRender      = toRender && (rendering[toRender[0]] || rendering[toRender[1]]),
+                isEverythingRendered    = !toRender && Y.Object.isEmpty(rendering);
+
+            if (!actionQueue.isRunning()) {
+                if (!isBlockingToRender && (!waitForEverything || isEverythingRendered)) {
+                    toRender = null;
+                    actionQueue.run();
+                }
             }
         }
 
-        self.sideViews[source.side].renderAction({ role: 'source', action: action }, handleRendered.bind(self, 'source'));
-        self.sideViews[target.side].renderAction({ role: 'target', action: action }, handleRendered.bind(self, 'target'));
+        Y.each(actions, function(currentAction, i){
+            var currentSource   = currentAction.source,
+                currentSourceId = currentSource.side + currentSource.position,
+                currentTarget   = currentAction.target,
+                currentTargetId = currentTarget.side + currentTarget.position,
+                nextAction      = actions[i+1];
+
+            actionQueue.add(function(){
+                var nextSource, nextSourceId, nextTarget, nextTargetId;
+
+                rendering[currentSourceId] = true;
+                rendering[currentTargetId] = true;
+
+                if (nextAction) {
+                    nextSource      = nextAction.source;
+                    nextSourceId    = nextSource.side + nextSource.position;
+                    nextTarget      = nextAction.target;
+                    nextTargetId    = nextTarget.side + nextTarget.position;
+
+                    // if the next action's units are rendering, pause now
+                    if (rendering[nextTargetId] || rendering[nextSourceId]) {
+                        toRender = [ nextSourceId, nextTargetId ];
+                        actionQueue.pause();
+                    }
+                } else {
+                    // if this is the last action, pause and wait for everything to finish before the last callback
+                    waitForEverything = true;
+                    actionQueue.pause();
+                }
+
+                setTimeout(function(){
+                    self.sideViews[currentSource.side].renderAction({
+                        role: 'source',
+                        action: currentAction
+                    }, handleRendered.bind(self, currentSourceId));
+                    self.sideViews[currentTarget.side].renderAction({
+                        role: 'target',
+                        action: currentAction
+                    }, handleRendered.bind(self, currentTargetId));
+                }, Math.random()*500);
+            });
+        });
+
+        actionQueue.add(callback);
+
+        return actionQueue;
     };
 
     Y.namespace('Battlefield').BattleView = BattleView;
 
-}, '0.0.0', {requires: ['battlefield-side-view']});
+}, '0.0.0', {requires: ['battlefield-side-view', 'async-queue']});

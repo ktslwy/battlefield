@@ -30,6 +30,12 @@ YUI.add('battlefield-side-view', function (Y) {
         });
 
         self.unitViews = unitViews;
+
+        Y.each(slotContainers, function(slotContainer, i){
+            if (!self._getUnitViewByPos(i+1)) {
+                slotContainer.visible = false;
+            }
+        });
     };
 
     SideView.prototype._handleUnitViewsRendered = function(i) {
