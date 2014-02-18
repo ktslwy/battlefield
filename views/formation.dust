@@ -1,0 +1,28 @@
+{> "partials/page-header" /}
+
+<canvas id="formation" width="{appConfig.stageSize.height}" height="{appConfig.stageSize.height}"></canvas>
+
+<script>
+yui.use(function(Y){
+    Y.AppConfig = {appConfig|js|s};
+});
+
+yui.use('node', 'battlefield-spritesheets', 'battlefield-formation', 'battlefield-assets', function(Y){
+
+    var formationStage = new createjs.Stage(Y.one('#formation').getDOMNode()),
+        formation = new Y.Battlefield.Formation({
+            formationStage : formationStage
+        });
+
+    createjs.Ticker.setFPS(12);
+    createjs.Ticker.addEventListener("tick", formationStage);
+
+    Y.Battlefield.Assets.loadAssets(function(){
+        Y.Battlefield.SpriteSheets.loadSpriteSheets();
+        formation.init();
+    });
+
+});
+</script>
+
+{> "partials/page-footer" /}

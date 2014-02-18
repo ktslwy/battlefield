@@ -1,6 +1,7 @@
 'use strict';
 
-var index = require('../../index');
+var index       = require('../../index'),
+    appConfig   = require('../../configs/app');
 
 module.exports = function(req, res){
     var query       = req.query,
@@ -12,7 +13,8 @@ module.exports = function(req, res){
     } else {
         res.render('battle', {
             query: query,
-            battleData: JSON.stringify(battleData)
+            battleData: battleData,
+            appConfig: appConfig
         });
     }
 };

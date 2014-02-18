@@ -4,6 +4,8 @@
 YUI.add('battlefield-battle-view', function (Y) {
     'use strict';
 
+    var appConfig = Y.AppConfig;
+
     function BattleView(config) {
         var self = this;
 
@@ -76,7 +78,7 @@ YUI.add('battlefield-battle-view', function (Y) {
             slotContainersRight = [],
             rows                = 5,
             columns             = 5,
-            slotSize            = { width: 75, height: 75 },
+            slotSize            = { width: appConfig.slotSize.width, height: appConfig.slotSize.height },
             spacing             = self._computeSlotSpacing(canvas, slotSize, rows, columns),
             slotPositionX       = 0,
             slotPositionY       = 0,
@@ -113,7 +115,7 @@ YUI.add('battlefield-battle-view', function (Y) {
 
         slotContainer.x = x;
         slotContainer.y = y;
-        slotContainer.setBounds(x, y, 75, 75);
+        slotContainer.setBounds(x, y, appConfig.slotSize.width, appConfig.slotSize.height);
 
         slotShape.x = 0;
         slotShape.y = 0;

@@ -1,10 +1,14 @@
 <script>
+yui.use(function(Y){
+    Y.AppConfig = {appConfig|js|s};
+});
+
 yui.use('node', 'battlefield-spritesheets', 'battlefield-battle', 'battlefield-assets', function(Y){
 
     var battleStage = new createjs.Stage(Y.one('#battlefield').getDOMNode()),
         battle = new Y.Battlefield.Battle({
             battleStage : battleStage,
-            battleData  : {battleData|s}
+            battleData  : {battleData|js|s}
         });
 
     createjs.Ticker.setFPS(12);

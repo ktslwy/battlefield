@@ -9,7 +9,8 @@ var express     = require('express'),
     controllers;
 
 controllers = {
-    battlePage: require('./controllers/pages/battle-page')
+    battlePage      : require('./controllers/pages/battle-page'),
+    formationPage   : require('./controllers/pages/formation-page')
 };
 
 // retain whitespace and newlines
@@ -23,6 +24,7 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', controllers.battlePage);
+app.get('/formation', controllers.formationPage);
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));

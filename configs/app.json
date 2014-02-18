@@ -1,0 +1,10 @@
+{
+    "slotSize": {
+        "width": 75,
+        "height": 75
+    },
+    "stageSize": {
+        "width": 900,
+        "height": 405
+    }
+}
