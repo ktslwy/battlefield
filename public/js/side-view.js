@@ -4,6 +4,14 @@
 YUI.add('battlefield-side-view', function (Y) {
     'use strict';
 
+    var APP_CONFIG      = Y.AppConfig,
+        SLOT_SIZE       = APP_CONFIG.slotSize,
+        SLOT_GRAPHIC    = new createjs.Graphics(),
+        ROWS            = 5,
+        COLUMNS         = 5;
+
+    SLOT_GRAPHIC.beginFill('#ffffff').drawRoundRectComplex(0, 0, SLOT_SIZE.width, SLOT_SIZE.height, 10, 10, 10, 10).endFill();
+
     function SideView(config) {
         var self = this;
 
@@ -11,8 +19,76 @@ YUI.add('battlefield-side-view', function (Y) {
     }
 
     SideView.prototype.render = function(callback) {
+        var self = this;
+
+        self._renderSlots();
+        self._renderUnitViews(callback);
+    };
+
+    SideView.prototype._renderSlots = function() {
         var self            = this,
-            slotContainers  = self.config.slotContainers,
+            side            = self.config.side,
+            sideContainer   = self.config.container,
+            containerBounds = sideContainer.getBounds(),
+            slotContainers  = [],
+            spacing         = self._computeSlotSpacing(),
+            slotPositionX   = 0,
+            slotPositionY   = 0,
+            slotIndex       = 0,
+            rowCount, columnCount, slotContainer;
+
+        for (rowCount=0; rowCount<ROWS; rowCount++) {
+            slotPositionY += spacing;
+            slotPositionX = side === 'left' ? 0 : containerBounds.width;
+            for (columnCount=0; columnCount<COLUMNS; columnCount++) {
+                slotPositionX = side === 'left' ? (slotPositionX + spacing) : (slotPositionX - spacing - SLOT_SIZE.width);
+                slotContainer = self._getSlotContainer(slotIndex + 1, slotPositionX, slotPositionY);
+                slotContainers[slotIndex] = slotContainer;
+                sideContainer.addChild(slotContainer);
+                slotPositionX = side === 'left' ? (slotPositionX + SLOT_SIZE.width) : slotPositionX;
+                slotIndex++;
+            }
+            slotPositionY += SLOT_SIZE.height;
+        }
+
+        self.slotContainers = slotContainers;
+    };
+
+    SideView.prototype._computeSlotSpacing = function() {
+        var self            = this,
+            containerBounds = self.config.container.getBounds(),
+            totalSlotHeight = ROWS * SLOT_SIZE.height,
+            totalSpacing    = containerBounds.height - totalSlotHeight,
+            spacing         = totalSpacing / (ROWS + 1); // + 1 to include bottom border spacing
+
+        return spacing;
+    };
+
+    SideView.prototype._getSlotContainer = function(index, x, y) {
+        var slotContainer   = new createjs.Container(),
+            slotShape       = new createjs.Shape(SLOT_GRAPHIC),
+            slotIndexText   = new createjs.Text(index, 'bold 11px monospace', '#000');
+
+        slotContainer.x = x;
+        slotContainer.y = y;
+        slotContainer.setBounds(x, y, SLOT_SIZE.width, SLOT_SIZE.height);
+
+        slotShape.x = 0;
+        slotShape.y = 0;
+        slotShape.alpha = 0.25;
+        slotShape.name = 'background';
+        slotContainer.addChild(slotShape);
+
+        slotIndexText.x = 5;
+        slotIndexText.y = 5;
+        slotContainer.addChild(slotIndexText);
+
+        return slotContainer;
+    };
+
+    SideView.prototype._renderUnitViews = function(callback) {
+        var self            = this,
+            slotContainers  = self.slotContainers,
             units           = self.config.formationData.formation,
             unitViews       = [];
 

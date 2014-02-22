@@ -29,20 +29,23 @@ YUI.add('battlefield-battle-view', function (Y) {
         }
 
         self._renderBackground();
-        self._renderSlots();
         self._renderSide('left', handleRendered);
         self._renderSide('right', handleRendered);
     };
 
     BattleView.prototype._renderSide = function(side, callback) {
         var self            = this,
+            battleStage     = self.config.battleStage,
             formationData   = self.config.battleStartState[side + 'Formation'],
-            slotContainers  = self.slotContainers[side],
+            sideContainer   = self._getSideContainer(side),
             sideView;
 
+        battleStage.addChild(sideContainer);
+
         sideView = new Y.Battlefield.SideView({
-            formationData  : formationData,
-            slotContainers : slotContainers
+            side            : side,
+            formationData   : formationData,
+            container       : sideContainer
         });
 
         sideView.render(callback.bind(self, side));
@@ -69,73 +72,17 @@ YUI.add('battlefield-battle-view', function (Y) {
         self.backgroundShape = backgroundShape;
     };
 
-    BattleView.prototype._renderSlots = function() {
-        var self                = this,
-            battleStage         = self.config.battleStage,
-            canvas              = battleStage.canvas,
-            slotGraphic         = new createjs.Graphics(),
-            slotContainersLeft  = [],
-            slotContainersRight = [],
-            rows                = 5,
-            columns             = 5,
-            slotSize            = { width: appConfig.slotSize.width, height: appConfig.slotSize.height },
-            spacing             = self._computeSlotSpacing(canvas, slotSize, rows, columns),
-            slotPositionX       = 0,
-            slotPositionY       = 0,
-            slotIndex           = 0,
-            rowCount, columnCount;
+    BattleView.prototype._getSideContainer = function(side) {
+        var self            = this,
+            battleStage     = self.config.battleStage,
+            canvas          = battleStage.canvas,
+            sideContainer   = new createjs.Container();
 
-        slotGraphic.beginFill('#ffffff').drawRoundRectComplex(0, 0, slotSize.width, slotSize.height, 10, 10, 10, 10).endFill();
+        sideContainer.x = side === 'left' ? 0 : canvas.width - canvas.height;
+        sideContainer.y = 0;
+        sideContainer.setBounds(sideContainer.x, sideContainer.y, canvas.height, canvas.height);
 
-        for (rowCount=0; rowCount<rows; rowCount++) {
-            slotPositionY += spacing;
-            for (columnCount=0; columnCount<columns; columnCount++) {
-                slotPositionX += spacing;
-                slotContainersLeft[slotIndex] = self._getSlotContainer(slotIndex + 1, slotPositionX, slotPositionY, slotGraphic);
-                slotContainersRight[slotIndex] = self._getSlotContainer(slotIndex + 1, canvas.width - slotSize.width - slotPositionX, slotPositionY, slotGraphic);
-                battleStage.addChild(slotContainersLeft[slotIndex]);
-                battleStage.addChild(slotContainersRight[slotIndex]);
-                slotPositionX += slotSize.width;
-                slotIndex++;
-            }
-            slotPositionX = 0;
-            slotPositionY += slotSize.height;
-        }
-
-        self.slotContainers = {
-            left  : slotContainersLeft,
-            right : slotContainersRight
-        };
-    };
-
-    BattleView.prototype._getSlotContainer = function(index, x, y, slotGraphic) {
-        var slotContainer   = new createjs.Container(),
-            slotShape       = new createjs.Shape(slotGraphic),
-            slotIndexText   = new createjs.Text(index, 'bold 11px monospace', '#000');
-
-        slotContainer.x = x;
-        slotContainer.y = y;
-        slotContainer.setBounds(x, y, appConfig.slotSize.width, appConfig.slotSize.height);
-
-        slotShape.x = 0;
-        slotShape.y = 0;
-        slotShape.alpha = 0.25;
-        slotShape.name = 'background';
-        slotContainer.addChild(slotShape);
-
-        slotIndexText.x = 5;
-        slotIndexText.y = 5;
-        slotContainer.addChild(slotIndexText);
-
-        return slotContainer;
-    };
-
-    BattleView.prototype._computeSlotSpacing = function(canvas, slotSize, rows, columns) {
-        var totalSlotHeight = rows * slotSize.height,
-            totalSpacing    = canvas.height - totalSlotHeight,
-            spacing         = totalSpacing / (rows + 1); // + 1 to include bottom border spacing
-
-        return spacing;
+        return sideContainer;
     };
 
     BattleView.prototype.renderRound = function(roundData, callback) {
