@@ -22,7 +22,7 @@ YUI.add('battlefield-unit-view', function (Y) {
         self.config = config;
     }
 
-    UnitView.prototype.render = function(callback) {
+    UnitView.prototype.render = function(withDelay, callback) {
         var self            = this,
             unitData        = self.config.unitData,
             slotContainer   = self.config.slotContainer,
@@ -31,7 +31,7 @@ YUI.add('battlefield-unit-view', function (Y) {
             unitSprite      = new createjs.Sprite(unitSpriteSheet, 'init'),
             slotBounds      = slotContainer.getBounds(),
             unitBounds      = unitSprite.getBounds(),
-            initDelay       = Math.random()*1000;
+            initDelay       = withDelay ? (Math.random()*1000) : false;
 
         // by default, slot and sprite are left and top aligned at x=0, y=0
         if (side === 'right') {
@@ -44,11 +44,15 @@ YUI.add('battlefield-unit-view', function (Y) {
         // // align bottom then have 5 px from the bottom
         unitSprite.y = slotBounds.height - unitBounds.height - 5;
 
+        unitSprite.name = 'unit';
+
         slotContainer.addChild(unitSprite);
         setTimeout(function(){
             unitSprite.gotoAndPlay('stand');
             self._renderStats();
-            callback();
+            if (typeof callback === 'function') {
+                callback();
+            }
         }, initDelay);
 
         self.unitSprite = unitSprite;
@@ -148,6 +152,16 @@ YUI.add('battlefield-unit-view', function (Y) {
                 callback();
             }
         }
+    };
+
+    UnitView.prototype.updateUnitData = function(unitData) {
+        var self = this,
+            unitSprite = self.unitSprite;
+
+        self.config.unitData = unitData;
+        unitSprite.stop();
+        unitSprite.parent.removeChild(unitSprite);
+        self.render(false);
     };
 
     Y.namespace('Battlefield').UnitView = UnitView;

@@ -92,7 +92,8 @@ BaseUnit.prototype.getData = function() {
         position    : self.position,
         status      : self.status,
         stats       : _.clone(self.stats),
-        name        : self.name
+        name        : self.name,
+        title       : self.title
     };
 };
 

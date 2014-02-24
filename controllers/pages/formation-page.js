@@ -9,7 +9,7 @@ module.exports = function(req, res){
         units       = unitFactory.getUnits();
 
     units = units.map(function(UnitClass){
-        return new UnitClass();
+        return new UnitClass().getData();
     });
 
     res.render('formation', {

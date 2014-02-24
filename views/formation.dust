@@ -25,6 +25,7 @@
 <script>
 yui.use(function(Y){
     Y.AppConfig = {appConfig|js|s};
+    Y.UnitConfig = {units|js|s};
 });
 
 yui.use('node', 'battlefield-spritesheets', 'battlefield-formation', 'battlefield-assets', function(Y){

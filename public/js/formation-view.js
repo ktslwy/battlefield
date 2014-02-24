@@ -4,7 +4,8 @@
 YUI.add('battlefield-formation-view', function (Y) {
     'use strict';
 
-    var appConfig = Y.AppConfig;
+    var APP_CONFIG  = Y.AppConfig,
+        UNIT_CONFIG = Y.UnitConfig;
 
     function FormationView(config) {
         var self = this;
@@ -114,9 +115,23 @@ YUI.add('battlefield-formation-view', function (Y) {
         });
 
         canvasNode.on('drop', function(e){
-            var nativeEvent = e._event;
+            var nativeEvent = e._event,
+                unitName    = nativeEvent.dataTransfer.getData('unitName'),
+                targetSlot  = lastHighlightedSlot,
+                unitData;
 
-            console.log(nativeEvent.dataTransfer.getData('unitName'));
+            Y.each(UNIT_CONFIG, function(unitConfig) {
+                if (unitConfig.name === unitName) {
+                    unitData = Y.clone(unitConfig);
+                }
+            });
+
+            unitData.side = 'right';
+            unitData.position = targetSlot.parent.getChildIndex(targetSlot) + 1;
+
+            sideView.updateFormationData({
+                updates: [ unitData ]
+            });
         });
     };
 

@@ -88,6 +88,24 @@ YUI.add('battlefield-side-view', function (Y) {
         return slotContainer;
     };
 
+    SideView.prototype._renderUnitViewAt = function(position) {
+        var self            = this,
+            slotContainers  = self.slotContainers,
+            unitView        = self._getUnitViewByPos(position),
+            unitData        = self._getUnitDataByPos(position);
+
+        if (unitView) {
+            unitView.updateUnitData(unitData);
+        } else {
+            unitView = new Y.Battlefield.UnitView({
+                unitData        : unitData,
+                slotContainer   : slotContainers[position - 1]
+            });
+            unitView.render(false);
+            self.unitViews[self.unitViews.length] = unitView;
+        }
+    };
+
     SideView.prototype._renderUnitViews = function(callback) {
         var self            = this,
             config          = self.config,
@@ -105,7 +123,7 @@ YUI.add('battlefield-side-view', function (Y) {
                     slotContainer   : slotContainers[unitData.position - 1]
                 });
 
-                unitView.render(self._handleUnitViewsRendered.bind(self, i));
+                unitView.render(true, self._handleUnitViewsRendered.bind(self, i));
                 unitViews[i] = unitView;
             });
         } else {
@@ -166,6 +184,22 @@ YUI.add('battlefield-side-view', function (Y) {
         return foundUnitView;
     };
 
+    SideView.prototype._getUnitDataByPos = function(pos) {
+        var self    = this,
+            units   = self.config.formationData.formation,
+            foundUnitData;
+
+        Y.Array.some(units, function(unitData){
+            if (unitData.position === pos) {
+                foundUnitData = unitData;
+                return true;
+            }
+            return false;
+        });
+
+        return foundUnitData;
+    };
+
     SideView.prototype.getSlotContainerAt = function(x, y) {
         var self            = this,
             container       = self.config.container,
@@ -189,6 +223,26 @@ YUI.add('battlefield-side-view', function (Y) {
         }
 
         return null;
+    };
+
+    SideView.prototype.updateFormationData = function(changes) {
+        var self        = this,
+            formation   = self.config.formationData.formation,
+            updates     = changes.updates;
+
+        Y.each(updates, function(updatedUnitData) {
+
+            var unitPosition        = updatedUnitData.position,
+                currentUnitData     = self._getUnitDataByPos(unitPosition);
+
+            if (currentUnitData) {
+                formation[formation.indexOf(currentUnitData)] = updatedUnitData;
+            } else {
+                formation[formation.length] = updatedUnitData;
+            }
+
+            self._renderUnitViewAt(updatedUnitData.position);
+        });
     };
 
     Y.namespace('Battlefield').SideView = SideView;
