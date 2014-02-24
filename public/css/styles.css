@@ -5,6 +5,77 @@ body {
 #battlefield {
   display: block;
   margin: 50px auto;
-  width: 900;
+  width: 900px;
   height: 405px;
+}
+
+.unit-selection {
+  width: 660px;
+  margin: 5px auto;
+}
+
+#formation {
+  width: 405px;
+  height: 405px;
+  float: left;
+}
+
+.unit-list-wrapper {
+  height: 405px;
+  width: 250px;
+  float: left;
+  margin-left: 5px;
+  background-color: gray;
+}
+.unit-list-wrapper ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.unit-info {
+  margin: 5px;
+  height: 52px;
+  border-bottom: 1px solid black;
+  padding-bottom: 5px;
+}
+.unit-info .unit-stats {
+  margin-left: 57px;
+  font-size: 77%;
+}
+.unit-info .unit-stats li {
+  display: inline;
+  margin-right: 6px;
+}
+.unit-info .unit-stats h4 {
+  margin: 0 3px 0 0;
+  display: inline;
+}
+.unit-info:last-child {
+  border: none;
+}
+
+.unit-thumbnail-wrapper {
+  border: 1px solid black;
+  padding: 5px;
+  float: left;
+  cursor: move;
+}
+
+.unit-thumbnail {
+  width: 40px;
+  height: 40px;
+}
+
+.unit-thumbnail-LightInfantry {
+  background: url("/img/light-infantry-left.png") -3px -25px;
+}
+
+.unit-thumbnail-HeavyInfantry {
+  background: url("/img/heavy-infantry-left.png") -3px -25px;
+}
+
+.unit-title {
+  margin: 0 0 5px 57px;
+  font-size: 77%;
 }

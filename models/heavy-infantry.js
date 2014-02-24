@@ -25,4 +25,6 @@ HeavyInfantry.prototype = new BaseUnit();
 
 HeavyInfantry.prototype.name = 'HeavyInfantry';
 
+HeavyInfantry.prototype.title = 'Heavy Infantry';
+
 module.exports = HeavyInfantry;

@@ -22,6 +22,8 @@ BaseUnit.prototype.stats = null;
 
 BaseUnit.prototype.name = null;
 
+BaseUnit.prototype.title = null;
+
 BaseUnit.prototype.isAlive = function() {
     return this.status === BaseUnit.STATUS_ALIVE;
 };

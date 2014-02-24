@@ -1,6 +1,26 @@
 {> "partials/page-header" /}
 
-<canvas id="formation" width="{appConfig.stageSize.height}" height="{appConfig.stageSize.height}"></canvas>
+<div class="unit-selection">
+    <canvas id="formation" width="{appConfig.stageSize.height}" height="{appConfig.stageSize.height}"></canvas>
+    <div class="unit-list-wrapper">
+        <ul class="unit-list">
+        {#units}
+            <li class="unit-info" data-unit-name="{name}">
+                <div class="unit-thumbnail-wrapper" draggable="true">
+                    <div class="unit-thumbnail unit-thumbnail-{name}"></div>
+                </div>
+                <h3 class="unit-title">{title}</h3>
+                <ul class="unit-stats">
+                    <li class="unit-stat"><h4>HP</h4><span>{stats.healthPoint}</span></li>
+                    <li class="unit-stat"><h4>ATK</h4><span>{stats.attack}</span></li>
+                    <li class="unit-stat"><h4>DEF</h4><span>{stats.defense}</span></li>
+                    <li class="unit-stat"><h4>ACT</h4><span>{stats.actionInterval}</span></li>
+                </ul>
+            </li>
+        {/units}
+        </ul>
+    </div>
+</div>
 
 <script>
 yui.use(function(Y){

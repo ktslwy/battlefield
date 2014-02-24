@@ -25,4 +25,6 @@ LightInfantry.prototype = new BaseUnit();
 
 LightInfantry.prototype.name = 'LightInfantry';
 
+LightInfantry.prototype.title = 'Light Infantry';
+
 module.exports = LightInfantry;

@@ -119,7 +119,7 @@ YUI.add('battlefield-unit-view', function (Y) {
         var self            = this,
             unitSprite      = self.unitSprite,
             slotContainer   = self.config.slotContainer,
-            slotBackground  = slotContainer.getChildByName('background'),
+            slotBackground  = slotContainer.getChildByName('slot-background'),
             slotBounds      = slotContainer.getBounds(),
             change,
             filter;

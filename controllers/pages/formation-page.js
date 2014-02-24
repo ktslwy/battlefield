@@ -1,12 +1,20 @@
 'use strict';
 
-var appConfig   = require('../../configs/app');
+var appConfig   = require('../../configs/app'),
+    UnitFactory = require('../../lib/unit-factory');
 
 module.exports = function(req, res){
-    var query       = req.query;
+    var query       = req.query,
+        unitFactory = new UnitFactory(),
+        units       = unitFactory.getUnits();
+
+    units = units.map(function(UnitClass){
+        return new UnitClass();
+    });
 
     res.render('formation', {
         query: query,
-        appConfig: appConfig
+        appConfig: appConfig,
+        units: units
     });
 };

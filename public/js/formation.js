@@ -16,8 +16,24 @@ YUI.add('battlefield-formation', function (Y) {
         var self = this;
 
         self.formationView.render();
+        self._initUnitDrag();
+    };
+
+    Formation.prototype._initUnitDrag = function() {
+        var self = this;
+
+        Y.one('.unit-list').delegate('dragstart', self._handleUnitDragStart, '.unit-thumbnail-wrapper', self);
+    };
+
+    Formation.prototype._handleUnitDragStart = function(e) {
+        var self        = this,
+            target      = e.target,
+            nativeEvent = e._event;
+
+        nativeEvent.dataTransfer.effectAllowed = 'move';
+        nativeEvent.dataTransfer.setData('unitName', target.ancestor('.unit-info').getData('unit-name'));
     };
 
     Y.namespace('Battlefield').Formation = Formation;
 
-}, '0.0.0', {requires: ['battlefield-formation-view']});
+}, '0.0.0', {requires: ['battlefield-formation-view', 'node-event-delegate']});
