@@ -7,6 +7,26 @@ YUI.add('battlefield-formation-view', function (Y) {
     var APP_CONFIG  = Y.AppConfig,
         UNIT_CONFIG = Y.UnitConfig;
 
+    function getEventOffset(e) {
+        if (e.offsetX !== undefined && e.offsetY !== undefined) {
+            return {x: e.offsetX, y:e.offsetY};
+        }
+
+        var node    = e.target,
+            offset  = {x: 0, y: 0};
+
+        while (node.offsetParent) {
+            offset.x += node.offsetLeft;
+            offset.y += node.offsetTop;
+            node = node.offsetParent;
+        }
+
+        offset.x = e.pageX - offset.x;
+        offset.y = e.pageY - offset.y;
+
+        return offset;
+    }
+
     function FormationView(config) {
         var self = this;
 
@@ -91,7 +111,7 @@ YUI.add('battlefield-formation-view', function (Y) {
             lastExecutedDragOver = Date.now();
 
             var nativeEvent = e._event,
-                mouseXY     = { x: nativeEvent.layerX, y: nativeEvent.layerY },
+                mouseXY     = getEventOffset(nativeEvent),
                 slotContainer;
 
             slotContainer = sideView.getSlotContainerAt(mouseXY.x, mouseXY.y);
