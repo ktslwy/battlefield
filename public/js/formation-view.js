@@ -98,8 +98,11 @@ YUI.add('battlefield-formation-view', function (Y) {
             canvasNode              = Y.one(formationStage.canvas),
             lastExecutedDragOver    = 0,
             dragOverExecuteInterval = 20,
-            lastHighlightedSlot;
+            mouseDownSlot;
 
+        formationStage.enableMouseOver(dragOverExecuteInterval);
+
+        // enter the canvas for drag starting from outside ofthe canvas
         canvasNode.on('dragover', function(e){
             if (e.preventDefault) {
                 e.preventDefault();
@@ -114,30 +117,23 @@ YUI.add('battlefield-formation-view', function (Y) {
                 mouseXY     = getEventOffset(nativeEvent),
                 slotContainer;
 
-            slotContainer = sideView.getSlotContainerAt(mouseXY.x, mouseXY.y);
+            self._handleMouseOverAt(mouseXY.x, mouseXY.y);
 
-            if (slotContainer !== lastHighlightedSlot) {
-                if (lastHighlightedSlot) {
-                    lastHighlightedSlot.getChildByName('slot-background').alpha = 0.25;
-                }
-                lastHighlightedSlot = slotContainer;
-                if (slotContainer) {
-                    slotContainer.getChildByName('slot-background').alpha = 0.5;
-                }
+            if (slotContainer !== self._lastHighlightedSlot) {
                 nativeEvent.dataTransfer.dropEffect = 'move';
             }
         });
 
-        canvasNode.on(['dragleave', 'drop'], function(e){
-            if (lastHighlightedSlot) {
-                lastHighlightedSlot.getChildByName('slot-background').alpha = 0.25;
-            }
+        // leave the canvas for drag starting from outside the canvas
+        canvasNode.on('dragleave', function(e){
+            self._toggleSlotHighlight(self._lastHighlightedSlot, false);
         });
 
+        // drop inside the canvas for drag starting from outside the canvas
         canvasNode.on('drop', function(e){
             var nativeEvent = e._event,
                 unitName    = nativeEvent.dataTransfer.getData('unitName'),
-                targetSlot  = lastHighlightedSlot,
+                targetSlot  = self._lastHighlightedSlot,
                 unitData;
 
             Y.each(UNIT_CONFIG, function(unitConfig) {
@@ -147,12 +143,95 @@ YUI.add('battlefield-formation-view', function (Y) {
             });
 
             unitData.side = 'right';
-            unitData.position = targetSlot.parent.getChildIndex(targetSlot) + 1;
+            unitData.position = targetSlot.slotIndex;
 
             sideView.updateFormationData({
                 updates: [ unitData ]
             });
         });
+
+        // mouse over in the canvas when not dragging
+        formationStage.on('mouseover', function(e){
+            self._handleMouseOverAt(e.stageX, e.stageY);
+        });
+
+        // leave the canvas when not dragging
+        formationStage.on('rollout', function(e){
+            self._toggleSlotHighlight(self._lastHighlightedSlot, false);
+        });
+
+        // press on the canvas when not dragging
+        formationStage.on('mousedown', function(e){
+            var unit = e.target;
+
+            if (unit.name === 'unit') {
+                unit.offset = {x: e.stageX, y: e.stageY};
+                mouseDownSlot = sideView.getSlotContainerAt(e.stageX, e.stageY);
+                sideContainer.setChildIndex(mouseDownSlot, 0);
+            }
+        });
+
+        // drag inside the canvas for drag starting from inside the canvas
+        formationStage.on('pressmove', function(e){
+            var unit = e.target;
+
+            if (unit.name === 'unit') {
+                unit.x = unit.x + e.stageX - unit.offset.x;
+                unit.y = unit.y + e.stageY - unit.offset.y;
+                unit.offset = {x: e.stageX, y: e.stageY};
+            }
+        });
+
+        formationStage.on('pressup', function(e){
+            var unit = e.target,
+                unitData,
+                targetSlot;
+
+            if (unit.name === 'unit' || mouseDownSlot) {
+                targetSlot = sideView.getSlotContainerAt(e.stageX, e.stageY);
+                unitData = sideView.getUnitViewByPos(mouseDownSlot.slotIndex).config.unitData;
+
+                if (targetSlot) {
+                    sideView.updateFormationData({
+                        removes: [ mouseDownSlot.slotIndex ]
+                    });
+                    unitData.position = targetSlot.slotIndex;
+                }
+
+                sideView.updateFormationData({
+                    updates: [ unitData ]
+                });
+
+                mouseDownSlot = undefined;
+            }
+        });
+    };
+
+    FormationView.prototype._handleMouseOverAt = function(x, y) {
+        var self            = this,
+            slotContainer   = self.sideView.getSlotContainerAt(x, y);
+
+        if (slotContainer !== self._lastHighlightedSlot) {
+            if (self._lastHighlightedSlot) {
+                self._toggleSlotHighlight(self._lastHighlightedSlot, false);
+            }
+            self._lastHighlightedSlot = slotContainer;
+            if (slotContainer) {
+                self._toggleSlotHighlight(slotContainer, true);
+            }
+        }
+    };
+
+    FormationView.prototype._toggleSlotHighlight = function(slot, isHighlight) {
+        if (slot) {
+            slot.getChildByName('slot-background').alpha = isHighlight ? 0.5 : 0.25;
+        }
+    };
+
+    FormationView.prototype.getFormationData = function() {
+        var self = this;
+
+        return self.sideView.config.formationData;
     };
 
     Y.namespace('Battlefield').FormationView = FormationView;

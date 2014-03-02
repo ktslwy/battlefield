@@ -11,7 +11,7 @@ function HeavyInfantry() {
 
 HeavyInfantry.baseStats = {
 
-    healthPoint: 20,
+    healthPoint: 25,
 
     attack: 1,
 

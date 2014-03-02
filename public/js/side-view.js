@@ -74,6 +74,7 @@ YUI.add('battlefield-side-view', function (Y) {
         slotContainer.x = x;
         slotContainer.y = y;
         slotContainer.setBounds(x, y, SLOT_SIZE.width, SLOT_SIZE.height);
+        slotContainer.slotIndex = index;
 
         slotShape.x = 0;
         slotShape.y = 0;
@@ -91,7 +92,7 @@ YUI.add('battlefield-side-view', function (Y) {
     SideView.prototype._renderUnitViewAt = function(position) {
         var self            = this,
             slotContainers  = self.slotContainers,
-            unitView        = self._getUnitViewByPos(position),
+            unitView        = self.getUnitViewByPos(position),
             unitData        = self._getUnitDataByPos(position);
 
         if (unitView) {
@@ -134,7 +135,7 @@ YUI.add('battlefield-side-view', function (Y) {
 
         if (config.hideEmptySlots) {
             Y.each(slotContainers, function(slotContainer, i){
-                if (!self._getUnitViewByPos(i+1)) {
+                if (!self.getUnitViewByPos(i+1)) {
                     slotContainer.visible = false;
                 }
             });
@@ -159,7 +160,7 @@ YUI.add('battlefield-side-view', function (Y) {
             role        = option.role,
             effects     = action.effects,
             unitPos     = action[role].position,
-            unitView    = self._getUnitViewByPos(unitPos);
+            unitView    = self.getUnitViewByPos(unitPos);
 
         if (role === 'source') {
             unitView.renderAction({ role: role }, callback);
@@ -168,13 +169,15 @@ YUI.add('battlefield-side-view', function (Y) {
         }
     };
 
-    SideView.prototype._getUnitViewByPos = function(pos) {
+    SideView.prototype.getUnitViewByPos = function(pos) {
         var self        = this,
             unitViews   = self.unitViews,
             foundUnitView;
 
         Y.Array.some(unitViews, function(unitView){
-            if (unitView.config.unitData.position === pos) {
+            var unitData = unitView.config.unitData;
+
+            if (unitData && unitData.position === pos) {
                 foundUnitView = unitView;
                 return true;
             }
@@ -228,7 +231,18 @@ YUI.add('battlefield-side-view', function (Y) {
     SideView.prototype.updateFormationData = function(changes) {
         var self        = this,
             formation   = self.config.formationData.formation,
-            updates     = changes.updates;
+            updates     = changes.updates,
+            removes     = changes.removes;
+
+        Y.each(removes, function(removedPosition) {
+            var currentUnitData = self._getUnitDataByPos(removedPosition);
+
+            if (currentUnitData) {
+                formation.splice(formation.indexOf(currentUnitData), 1);
+            }
+
+            self._renderUnitViewAt(removedPosition);
+        });
 
         Y.each(updates, function(updatedUnitData) {
 

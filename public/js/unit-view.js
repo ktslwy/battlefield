@@ -35,16 +35,17 @@ YUI.add('battlefield-unit-view', function (Y) {
 
         // by default, slot and sprite are left and top aligned at x=0, y=0
         if (side === 'right') {
-            // align right then have 5px from the right
-            unitSprite.x = slotBounds.width - unitBounds.width - 5;
+            // align right then have 8px from the right
+            unitSprite.x = slotBounds.width - unitBounds.width - 8;
         } else {
-            // have 5 px from the left
-            unitSprite.x = 5;
+            // have 8 px from the left
+            unitSprite.x = 8;
         }
         // // align bottom then have 5 px from the bottom
         unitSprite.y = slotBounds.height - unitBounds.height - 5;
 
         unitSprite.name = 'unit';
+        unitSprite.shadow = new createjs.Shadow("#000000", side === 'left' ? -3 : 3, 0, 10);
 
         slotContainer.addChild(unitSprite);
         setTimeout(function(){
@@ -64,14 +65,21 @@ YUI.add('battlefield-unit-view', function (Y) {
             slotContainer   = self.config.slotContainer,
             slotBounds      = slotContainer.getBounds(),
             hpValue         = unitData.stats.healthPoint,
-            hpText          = new createjs.Text(hpValue + '/' + hpValue, 'normal 10px monospace', '#66FF66'),
-            hpTextBounds    = hpText.getBounds();
+            hpText          = self.hpText,
+            hpTextBounds;
+
+        if (hpText) {
+            hpText.text = hpValue + '/' + hpValue;
+        } else {
+            hpText = new createjs.Text(hpValue + '/' + hpValue, 'normal 10px monospace', '#66FF66');
+            slotContainer.addChild(hpText);
+            self.hpText = hpText;
+        }
+
+        hpTextBounds = hpText.getBounds();
 
         hpText.x = slotBounds.width - hpTextBounds.width - 5;
         hpText.y = 5;
-        slotContainer.addChild(hpText);
-
-        self.hpText = hpText;
     };
 
     UnitView.prototype.renderAction = function(option, callback) {
@@ -155,13 +163,19 @@ YUI.add('battlefield-unit-view', function (Y) {
     };
 
     UnitView.prototype.updateUnitData = function(unitData) {
-        var self = this,
-            unitSprite = self.unitSprite;
+        var self        = this,
+            unitSprite  = self.unitSprite,
+            hpText      = self.hpText;
 
         self.config.unitData = unitData;
         unitSprite.stop();
         unitSprite.parent.removeChild(unitSprite);
-        self.render(false);
+        hpText.parent.removeChild(hpText);
+        delete self.hpText;
+
+        if (unitData) {
+            self.render(false);
+        }
     };
 
     Y.namespace('Battlefield').UnitView = UnitView;
