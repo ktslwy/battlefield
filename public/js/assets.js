@@ -1,5 +1,4 @@
 /*jshint browser:true*/
-/*globals createjs*/
 
 YUI.add('battlefield-assets', function (Y) {
     'use strict';

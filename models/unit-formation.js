@@ -1,7 +1,6 @@
 'use strict';
 
-var _           = require('lodash'),
-    UnitFactory = require('../lib/unit-factory'),
+var UnitFactory = require('../lib/unit-factory'),
     unitFactory = new UnitFactory();
 
 function UnitFormation(config) {

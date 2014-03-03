@@ -27,12 +27,12 @@ describe('UnitFormation', function(){
             var unitFormation = new UnitFormation({formation: allLiFormation});
 
             unitFormation.setSide(BaseUnit.SIDE_LEFT);
-            unitFormation.formation.forEach(function(unit, i){
+            unitFormation.formation.forEach(function(unit){
                 assert.equal(unit.side, BaseUnit.SIDE_LEFT);
             });
 
             unitFormation.setSide(null);
-            unitFormation.formation.forEach(function(unit, i){
+            unitFormation.formation.forEach(function(unit){
                 assert.equal(unit.side, null);
             });
         });

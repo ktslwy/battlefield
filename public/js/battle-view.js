@@ -4,8 +4,6 @@
 YUI.add('battlefield-battle-view', function (Y) {
     'use strict';
 
-    var appConfig = Y.AppConfig;
-
     function BattleView(config) {
         var self = this;
 

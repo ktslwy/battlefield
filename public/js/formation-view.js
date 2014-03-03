@@ -4,8 +4,7 @@
 YUI.add('battlefield-formation-view', function (Y) {
     'use strict';
 
-    var APP_CONFIG  = Y.AppConfig,
-        UNIT_CONFIG = Y.UnitConfig;
+    var UNIT_CONFIG = Y.UnitConfig;
 
     function getEventOffset(e) {
         if (e.offsetX !== undefined && e.offsetY !== undefined) {
@@ -33,18 +32,28 @@ YUI.add('battlefield-formation-view', function (Y) {
         self.config = config;
     }
 
+    FormationView.prototype.get = function(key) {
+        var self = this;
+
+        if (key === 'formation') {
+            return self._sideView && self._sideView.get('formationData');
+        }
+
+        return self.config[key] || self[key];
+    };
+
     FormationView.prototype.render = function() {
         var self = this;
 
         self._renderBackground();
         self._renderSide();
-        self._initDragEvents();
+        self._initDragDrop();
     };
 
     FormationView.prototype._renderBackground = function() {
         var self            = this,
             assets          = Y.Battlefield.Assets,
-            formationStage  = self.config.formationStage,
+            formationStage  = self.get('formationStage'),
             canvas          = formationStage.canvas,
             backgroundShape = new createjs.Shape();
 
@@ -53,13 +62,13 @@ YUI.add('battlefield-formation-view', function (Y) {
         backgroundShape.graphics.beginBitmapFill(assets.BackgroundTexture,'repeat').drawRect(0, 0, canvas.width, canvas.height);
         formationStage.addChild(backgroundShape);
 
-        self.backgroundShape = backgroundShape;
+        self._backgroundShape = backgroundShape;
     };
 
     FormationView.prototype._renderSide = function() {
         var self            = this,
-            formationStage  = self.config.formationStage,
-            sideContainer   = self._getSideContainer(),
+            formationStage  = self.get('formationStage'),
+            sideContainer   = self._createSideContainer(),
             sideView;
 
         formationStage.addChild(sideContainer);
@@ -68,18 +77,18 @@ YUI.add('battlefield-formation-view', function (Y) {
             side            : 'right',
             formationData   : { formation: [] },
             container       : sideContainer,
-            hideEmptySlots  : false
+            isEditMode      : true
         });
 
         sideView.render();
 
-        self.sideView = sideView;
-        self.sideContainer = sideContainer;
+        self._sideView = sideView;
+        self._sideContainer = sideContainer;
     };
 
-    FormationView.prototype._getSideContainer = function() {
+    FormationView.prototype._createSideContainer = function() {
         var self            = this,
-            formationStage  = self.config.formationStage,
+            formationStage  = self.get('formationStage'),
             canvas          = formationStage.canvas,
             sideContainer   = new createjs.Container();
 
@@ -90,23 +99,20 @@ YUI.add('battlefield-formation-view', function (Y) {
         return sideContainer;
     };
 
-    FormationView.prototype._initDragEvents = function() {
+    FormationView.prototype._initDragDrop = function() {
         var self                    = this,
-            formationStage          = self.config.formationStage,
-            sideView                = self.sideView,
-            sideContainer           = self.sideContainer,
+            formationStage          = self.get('formationStage'),
+            sideView                = self._sideView,
             canvasNode              = Y.one(formationStage.canvas),
             lastExecutedDragOver    = 0,
             dragOverExecuteInterval = 20,
-            mouseDownSlot;
+            mouseDownXY;
 
         formationStage.enableMouseOver(dragOverExecuteInterval);
 
         // enter the canvas for drag starting from outside ofthe canvas
         canvasNode.on('dragover', function(e){
-            if (e.preventDefault) {
-                e.preventDefault();
-            }
+            e.preventDefault();
 
             if (lastExecutedDragOver + dragOverExecuteInterval > Date.now()) {
                 return;
@@ -114,40 +120,35 @@ YUI.add('battlefield-formation-view', function (Y) {
             lastExecutedDragOver = Date.now();
 
             var nativeEvent = e._event,
-                mouseXY     = getEventOffset(nativeEvent),
-                slotContainer;
+                mouseXY     = getEventOffset(nativeEvent);
 
             self._handleMouseOverAt(mouseXY.x, mouseXY.y);
-
-            if (slotContainer !== self._lastHighlightedSlot) {
-                nativeEvent.dataTransfer.dropEffect = 'move';
-            }
         });
 
         // leave the canvas for drag starting from outside the canvas
-        canvasNode.on('dragleave', function(e){
-            self._toggleSlotHighlight(self._lastHighlightedSlot, false);
+        canvasNode.on('dragleave', function(){
+            self._handleMouseOverAt(-1, -1);
         });
 
         // drop inside the canvas for drag starting from outside the canvas
         canvasNode.on('drop', function(e){
-            var nativeEvent = e._event,
-                unitName    = nativeEvent.dataTransfer.getData('unitName'),
-                targetSlot  = self._lastHighlightedSlot,
+            var nativeEvent     = e._event,
+                mouseXY         = getEventOffset(nativeEvent),
+                unitName        = nativeEvent.dataTransfer.getData('unitName'),
                 unitData;
 
-            Y.each(UNIT_CONFIG, function(unitConfig) {
-                if (unitConfig.name === unitName) {
-                    unitData = Y.clone(unitConfig);
-                }
-            });
+            if (!unitName) {
+                return;
+            }
 
-            unitData.side = 'right';
-            unitData.position = targetSlot.slotIndex;
+            unitData = Y.clone(Y.Array.find(UNIT_CONFIG, function(unitConfig){
+                return unitConfig.name === unitName;
+            }));
 
-            sideView.updateFormationData({
-                updates: [ unitData ]
-            });
+            if (unitData) {
+                unitData.side = 'right';
+                self._handleDrop(unitData, mouseXY);
+            }
         });
 
         // mouse over in the canvas when not dragging
@@ -156,8 +157,8 @@ YUI.add('battlefield-formation-view', function (Y) {
         });
 
         // leave the canvas when not dragging
-        formationStage.on('rollout', function(e){
-            self._toggleSlotHighlight(self._lastHighlightedSlot, false);
+        formationStage.on('rollout', function(){
+            self._handleMouseOverAt(-1, -1);
         });
 
         // press on the canvas when not dragging
@@ -166,8 +167,8 @@ YUI.add('battlefield-formation-view', function (Y) {
 
             if (unit.name === 'unit') {
                 unit.offset = {x: e.stageX, y: e.stageY};
-                mouseDownSlot = sideView.getSlotContainerAt(e.stageX, e.stageY);
-                sideContainer.setChildIndex(mouseDownSlot, 0);
+                sideView.bringPositionToTop(sideView.getPositionByXY(e.stageX, e.stageY));
+                mouseDownXY = {x: e.stageX, y: e.stageY};
             }
         });
 
@@ -182,56 +183,51 @@ YUI.add('battlefield-formation-view', function (Y) {
             }
         });
 
+        // drop inside the canvas for drag starting from inside the canvas
         formationStage.on('pressup', function(e){
-            var unit = e.target,
-                unitData,
-                targetSlot;
+            var unit = e.target;
 
-            if (unit.name === 'unit' || mouseDownSlot) {
-                targetSlot = sideView.getSlotContainerAt(e.stageX, e.stageY);
-                unitData = sideView.getUnitViewByPos(mouseDownSlot.slotIndex).config.unitData;
-
-                if (targetSlot) {
-                    sideView.updateFormationData({
-                        removes: [ mouseDownSlot.slotIndex ]
-                    });
-                    unitData.position = targetSlot.slotIndex;
-                }
-
-                sideView.updateFormationData({
-                    updates: [ unitData ]
-                });
-
-                mouseDownSlot = undefined;
+            if (unit.name === 'unit' || mouseDownXY) {
+                self._handleDrop(mouseDownXY, {x: e.stageX, y: e.stageY});
+                mouseDownXY = undefined;
             }
         });
     };
 
-    FormationView.prototype._handleMouseOverAt = function(x, y) {
+    FormationView.prototype._handleDrop = function(from, to) {
         var self            = this,
-            slotContainer   = self.sideView.getSlotContainerAt(x, y);
+            sideView        = self._sideView,
+            isFromXY        = from.x !== undefined && from.y !== undefined,
+            targetPosition  = sideView.getPositionByXY(to.x, to.y),
+            sourcePosition,
+            unitData;
 
-        if (slotContainer !== self._lastHighlightedSlot) {
-            if (self._lastHighlightedSlot) {
-                self._toggleSlotHighlight(self._lastHighlightedSlot, false);
-            }
-            self._lastHighlightedSlot = slotContainer;
-            if (slotContainer) {
-                self._toggleSlotHighlight(slotContainer, true);
-            }
+        if (isFromXY) {
+            sourcePosition = sideView.getPositionByXY(from.x, from.y);
+            unitData = sideView.getUnitDataAt(sourcePosition);
+        } else {
+            unitData = from;
+        }
+
+        // if there isn't a source(drag from outside) or a target(drop to outside of slots),
+        // no need to remove from the original position
+        if (sourcePosition && targetPosition) {
+            sideView.updateFormationData({removes: [sourcePosition]});
+        }
+
+        // only need to udpate position if there is a target(drop to inside a slot)
+        if (targetPosition) {
+            unitData.position = targetPosition;
+        }
+
+        // only render if there is a source(drag from inside) or a target(drop to inside of slots)
+        if (sourcePosition || targetPosition) {
+            sideView.updateFormationData({updates: [unitData]});
         }
     };
 
-    FormationView.prototype._toggleSlotHighlight = function(slot, isHighlight) {
-        if (slot) {
-            slot.getChildByName('slot-background').alpha = isHighlight ? 0.5 : 0.25;
-        }
-    };
-
-    FormationView.prototype.getFormationData = function() {
-        var self = this;
-
-        return self.sideView.config.formationData;
+    FormationView.prototype._handleMouseOverAt = function(x, y) {
+        this._sideView.toggleHighlightAt(x, y, true, false);
     };
 
     Y.namespace('Battlefield').FormationView = FormationView;

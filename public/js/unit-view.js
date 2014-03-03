@@ -5,8 +5,7 @@ YUI.add('battlefield-unit-view', function (Y) {
     'use strict';
 
     var fullRedFilter   = new createjs.ColorFilter(1, 0.5, 0.5, 1),
-        halfRedFilter   = new createjs.ColorFilter(1, 0, 0, 1),
-        darkFilter      = new createjs.ColorFilter(0.2, 0, 0, 1);
+        halfRedFilter   = new createjs.ColorFilter(1, 0, 0, 1);
 
     function getOppositeSide(side) {
         if (side === 'left') {
@@ -20,18 +19,78 @@ YUI.add('battlefield-unit-view', function (Y) {
         var self = this;
 
         self.config = config;
+        self._displayObjects = {};
     }
 
-    UnitView.prototype.render = function(withDelay, callback) {
+    UnitView.prototype.get = function(key) {
+        var self        = this,
+            config      = self.config,
+            unitData    = config.unitData;
+
+        if (key === 'unitPosition') {
+            return unitData && unitData.position;
+        }
+
+        if (key === 'bounds') {
+            return self.get('slotContainer').getBounds();
+        }
+
+        return self.config[key] || self[key];
+    };
+
+    UnitView.prototype.getDisplayObject = function(key) {
+        return this._displayObjects[key];
+    };
+
+    UnitView.prototype._setDisplayObject = function(key, value) {
+        this._displayObjects[key] = value;
+    };
+
+    UnitView.prototype._removeDisplayObject = function(key) {
+        var object = this._displayObjects[key];
+
+        if (object) {
+            if (typeof object.stop === 'function') {
+                object.stop();
+            }
+            object.parent.removeChild(object);
+            delete this._displayObjects[key];
+        }
+    };
+
+    UnitView.prototype.render = function(callback) {
+        var self        = this,
+            isEditMode  = self.get('isEditMode'),
+            initDelay   = isEditMode ? false : (Math.random()*1000);
+
+        self._renderUnit();
+
+        setTimeout(function(){
+            var unitSprite = self.getDisplayObject('unitSprite');
+
+            self._renderStats();
+            if (unitSprite) {
+                unitSprite.gotoAndPlay('stand');
+            }
+            if (typeof callback === 'function') {
+                callback();
+            }
+        }, initDelay);
+
+        if (isEditMode) {
+            self._renderRemoveControl();
+        }
+    };
+
+    UnitView.prototype._renderUnit = function() {
         var self            = this,
-            unitData        = self.config.unitData,
-            slotContainer   = self.config.slotContainer,
+            unitData        = self.get('unitData'),
+            slotContainer   = self.get('slotContainer'),
             side            = unitData.side,
             unitSpriteSheet = Y.Battlefield.SpriteSheets[unitData.name][getOppositeSide(side)],
             unitSprite      = new createjs.Sprite(unitSpriteSheet, 'init'),
             slotBounds      = slotContainer.getBounds(),
-            unitBounds      = unitSprite.getBounds(),
-            initDelay       = withDelay ? (Math.random()*1000) : false;
+            unitBounds      = unitSprite.getBounds();
 
         // by default, slot and sprite are left and top aligned at x=0, y=0
         if (side === 'right') {
@@ -41,31 +100,22 @@ YUI.add('battlefield-unit-view', function (Y) {
             // have 8 px from the left
             unitSprite.x = 8;
         }
-        // // align bottom then have 5 px from the bottom
+        // align bottom then have 5 px from the bottom
         unitSprite.y = slotBounds.height - unitBounds.height - 5;
-
         unitSprite.name = 'unit';
         unitSprite.shadow = new createjs.Shadow("#000000", side === 'left' ? -3 : 3, 0, 10);
-
         slotContainer.addChild(unitSprite);
-        setTimeout(function(){
-            unitSprite.gotoAndPlay('stand');
-            self._renderStats();
-            if (typeof callback === 'function') {
-                callback();
-            }
-        }, initDelay);
 
-        self.unitSprite = unitSprite;
+        self._setDisplayObject('unitSprite', unitSprite);
     };
 
     UnitView.prototype._renderStats = function() {
         var self            = this,
-            unitData        = self.config.unitData,
-            slotContainer   = self.config.slotContainer,
+            unitData        = self.get('unitData'),
+            slotContainer   = self.get('slotContainer'),
             slotBounds      = slotContainer.getBounds(),
             hpValue         = unitData.stats.healthPoint,
-            hpText          = self.hpText,
+            hpText          = self.getDisplayObject('hpText'),
             hpTextBounds;
 
         if (hpText) {
@@ -73,13 +123,41 @@ YUI.add('battlefield-unit-view', function (Y) {
         } else {
             hpText = new createjs.Text(hpValue + '/' + hpValue, 'normal 10px monospace', '#66FF66');
             slotContainer.addChild(hpText);
-            self.hpText = hpText;
+            self._setDisplayObject('hpText', hpText);
         }
 
         hpTextBounds = hpText.getBounds();
-
         hpText.x = slotBounds.width - hpTextBounds.width - 5;
         hpText.y = 5;
+    };
+
+    UnitView.prototype._renderRemoveControl = function() {
+        var self            = this,
+            removeControl   = self.getDisplayObject('removeControl'),
+            slotContainer   = self.get('slotContainer'),
+            slotBounds;
+
+        if (removeControl) {
+            return;
+        }
+
+        slotBounds = slotContainer.getBounds();
+
+        removeControl = new createjs.Text('DEL', 'bold 10px monospace', 'red');
+        removeControl.x = 5;
+        removeControl.y = slotBounds.height - 15;
+        removeControl.visible = false;
+        slotContainer.addChild(removeControl);
+
+        slotContainer.on('rollover', function(){
+            removeControl.visible = false;
+        });
+
+        slotContainer.on('rollout', function(){
+            removeControl.visible = false;
+        });
+
+        self._setDisplayObject('removeControl', removeControl);
     };
 
     UnitView.prototype.renderAction = function(option, callback) {
@@ -95,7 +173,7 @@ YUI.add('battlefield-unit-view', function (Y) {
 
     UnitView.prototype._renderActionSource = function(option, callback) {
         var self        = this,
-            unitSprite  = self.unitSprite,
+            unitSprite  = self.getDisplayObject('unitSprite'),
             listener;
 
         listener = unitSprite.on('animationend', function(){
@@ -109,10 +187,10 @@ YUI.add('battlefield-unit-view', function (Y) {
     UnitView.prototype._renderActionTarget = function(option, callback) {
         var self            = this,
             effect          = option.effects && option.effects[0],
-            hpText          = self.hpText,
-            unitData        = self.config.unitData,
-            unitSprite      = self.unitSprite,
-            slotContainer   = self.config.slotContainer,
+            unitData        = self.get('unitData'),
+            slotContainer   = self.get('slotContainer'),
+            hpText          = self.getDisplayObject('hpText'),
+            unitSprite      = self.getDisplayObject('unitSprite'),
             hpValue;
 
         unitData.stats.healthPoint += effect.change;
@@ -129,12 +207,11 @@ YUI.add('battlefield-unit-view', function (Y) {
 
     UnitView.prototype._renderDamage = function(changes, callback) {
         var self            = this,
-            unitSprite      = self.unitSprite,
-            slotContainer   = self.config.slotContainer,
+            unitSprite      = self.getDisplayObject('unitSprite'),
+            slotContainer   = self.get('slotContainer'),
             slotBackground  = slotContainer.getChildByName('slot-background'),
             slotBounds      = slotContainer.getBounds(),
-            change,
-            filter;
+            change;
 
         if (!changes) {
             changes = [
@@ -162,19 +239,22 @@ YUI.add('battlefield-unit-view', function (Y) {
         }
     };
 
+    UnitView.prototype._clean = function() {
+        var self = this;
+
+        self._removeDisplayObject('unitSprite');
+        self._removeDisplayObject('hpText');
+        self._removeDisplayObject('removeControl');
+    };
+
     UnitView.prototype.updateUnitData = function(unitData) {
-        var self        = this,
-            unitSprite  = self.unitSprite,
-            hpText      = self.hpText;
+        var self = this;
 
         self.config.unitData = unitData;
-        unitSprite.stop();
-        unitSprite.parent.removeChild(unitSprite);
-        hpText.parent.removeChild(hpText);
-        delete self.hpText;
+        self._clean();
 
         if (unitData) {
-            self.render(false);
+            self.render();
         }
     };
 

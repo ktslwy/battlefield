@@ -8,17 +8,31 @@ YUI.add('battlefield-side-view', function (Y) {
         SLOT_SIZE       = APP_CONFIG.slotSize,
         SLOT_GRAPHIC    = new createjs.Graphics(),
         ROWS            = 5,
-        COLUMNS         = 5;
+        COLUMNS         = 5,
+        SLOT_HIGHLIGHTS = {
+            'true'  : 0.5,
+            'false' : 0.25
+        };
 
     SLOT_GRAPHIC.beginFill('#ffffff').drawRoundRectComplex(0, 0, SLOT_SIZE.width, SLOT_SIZE.height, 10, 10, 10, 10).endFill();
 
     function SideView(config) {
         var self = this;
 
-        config.hideEmptySlots = (typeof config.hideEmptySlots === 'boolean') ? config.hideEmptySlots : true;
-
         self.config = config;
     }
+
+    SideView.prototype.get = function(key) {
+        var self            = this,
+            config          = self.config,
+            formationData   = config.formationData;
+
+        if (key === 'units') {
+            return formationData && formationData.formation;
+        }
+
+        return self.config[key] || self[key];
+    };
 
     SideView.prototype.render = function(callback) {
         var self = this;
@@ -29,8 +43,8 @@ YUI.add('battlefield-side-view', function (Y) {
 
     SideView.prototype._renderSlots = function() {
         var self            = this,
-            side            = self.config.side,
-            sideContainer   = self.config.container,
+            side            = self.get('side'),
+            sideContainer   = self.get('container'),
             containerBounds = sideContainer.getBounds(),
             slotContainers  = [],
             spacing         = self._computeSlotSpacing(),
@@ -44,7 +58,7 @@ YUI.add('battlefield-side-view', function (Y) {
             slotPositionX = side === 'left' ? 0 : containerBounds.width;
             for (columnCount=0; columnCount<COLUMNS; columnCount++) {
                 slotPositionX = side === 'left' ? (slotPositionX + spacing) : (slotPositionX - spacing - SLOT_SIZE.width);
-                slotContainer = self._getSlotContainer(slotIndex + 1, slotPositionX, slotPositionY);
+                slotContainer = self._createSlotContainer(slotIndex + 1, slotPositionX, slotPositionY);
                 slotContainers[slotIndex] = slotContainer;
                 sideContainer.addChild(slotContainer);
                 slotPositionX = side === 'left' ? (slotPositionX + SLOT_SIZE.width) : slotPositionX;
@@ -53,12 +67,12 @@ YUI.add('battlefield-side-view', function (Y) {
             slotPositionY += SLOT_SIZE.height;
         }
 
-        self.slotContainers = slotContainers;
+        self._slotContainers = slotContainers;
     };
 
     SideView.prototype._computeSlotSpacing = function() {
         var self            = this,
-            containerBounds = self.config.container.getBounds(),
+            containerBounds = self.get('container').getBounds(),
             totalSlotHeight = ROWS * SLOT_SIZE.height,
             totalSpacing    = containerBounds.height - totalSlotHeight,
             spacing         = totalSpacing / (ROWS + 1); // + 1 to include bottom border spacing
@@ -66,7 +80,7 @@ YUI.add('battlefield-side-view', function (Y) {
         return spacing;
     };
 
-    SideView.prototype._getSlotContainer = function(index, x, y) {
+    SideView.prototype._createSlotContainer = function(index, x, y) {
         var slotContainer   = new createjs.Container(),
             slotShape       = new createjs.Shape(SLOT_GRAPHIC),
             slotIndexText   = new createjs.Text(index, 'bold 11px monospace', '#000');
@@ -91,27 +105,28 @@ YUI.add('battlefield-side-view', function (Y) {
 
     SideView.prototype._renderUnitViewAt = function(position) {
         var self            = this,
-            slotContainers  = self.slotContainers,
-            unitView        = self.getUnitViewByPos(position),
-            unitData        = self._getUnitDataByPos(position);
+            slotContainers  = self._slotContainers,
+            unitView        = self._getUnitViewAt(position),
+            unitData        = self.getUnitDataAt(position);
 
         if (unitView) {
             unitView.updateUnitData(unitData);
         } else {
             unitView = new Y.Battlefield.UnitView({
                 unitData        : unitData,
-                slotContainer   : slotContainers[position - 1]
+                slotContainer   : slotContainers[position - 1],
+                isEditMode      : self.get('isEditMode')
             });
-            unitView.render(false);
-            self.unitViews[self.unitViews.length] = unitView;
+            unitView.render();
+            self._unitViews.push(unitView);
         }
     };
 
     SideView.prototype._renderUnitViews = function(callback) {
         var self            = this,
-            config          = self.config,
-            slotContainers  = self.slotContainers,
-            units           = config.formationData.formation,
+            slotContainers  = self._slotContainers,
+            isEditMode      = self.get('isEditMode'),
+            units           = self.get('units'),
             unitViews       = [];
 
         self._unitViewsRenderedCallback = callback;
@@ -121,21 +136,22 @@ YUI.add('battlefield-side-view', function (Y) {
             Y.Array.forEach(units, function(unitData, i){
                 var unitView = new Y.Battlefield.UnitView({
                     unitData        : unitData,
-                    slotContainer   : slotContainers[unitData.position - 1]
+                    slotContainer   : slotContainers[unitData.position - 1],
+                    isEditMode      : isEditMode
                 });
 
-                unitView.render(true, self._handleUnitViewsRendered.bind(self, i));
+                unitView.render(self._handleUnitViewsRendered.bind(self, i));
                 unitViews[i] = unitView;
             });
         } else {
             setTimeout(callback, 0);
         }
 
-        self.unitViews = unitViews;
+        self._unitViews = unitViews;
 
-        if (config.hideEmptySlots) {
+        if (!isEditMode) {
             Y.each(slotContainers, function(slotContainer, i){
-                if (!self.getUnitViewByPos(i+1)) {
+                if (!self._getUnitViewAt(i+1)) {
                     slotContainer.visible = false;
                 }
             });
@@ -144,7 +160,7 @@ YUI.add('battlefield-side-view', function (Y) {
 
     SideView.prototype._handleUnitViewsRendered = function(i) {
         var self                = this,
-            unitViews           = self.unitViews,
+            unitViews           = self._unitViews,
             unitViewsRendered   = self._unitViewsRendered;
 
         unitViewsRendered[i] = true;
@@ -160,7 +176,7 @@ YUI.add('battlefield-side-view', function (Y) {
             role        = option.role,
             effects     = action.effects,
             unitPos     = action[role].position,
-            unitView    = self.getUnitViewByPos(unitPos);
+            unitView    = self._getUnitViewAt(unitPos);
 
         if (role === 'source') {
             unitView.renderAction({ role: role }, callback);
@@ -169,94 +185,102 @@ YUI.add('battlefield-side-view', function (Y) {
         }
     };
 
-    SideView.prototype.getUnitViewByPos = function(pos) {
+    SideView.prototype._getUnitViewAt = function(position) {
         var self        = this,
-            unitViews   = self.unitViews,
-            foundUnitView;
+            unitViews   = self._unitViews;
 
-        Y.Array.some(unitViews, function(unitView){
-            var unitData = unitView.config.unitData;
-
-            if (unitData && unitData.position === pos) {
-                foundUnitView = unitView;
-                return true;
-            }
-            return false;
+        return Y.Array.find(unitViews, function(unitView){
+            return unitView.get('unitPosition') === position;
         });
-
-        return foundUnitView;
     };
 
-    SideView.prototype._getUnitDataByPos = function(pos) {
+    SideView.prototype.getUnitDataAt = function(position) {
         var self    = this,
-            units   = self.config.formationData.formation,
-            foundUnitData;
+            units   = self.get('units');
 
-        Y.Array.some(units, function(unitData){
-            if (unitData.position === pos) {
-                foundUnitData = unitData;
-                return true;
-            }
-            return false;
+        return Y.Array.find(units, function(unit){
+            return unit.position === position;
         });
-
-        return foundUnitData;
     };
 
-    SideView.prototype.getSlotContainerAt = function(x, y) {
+    SideView.prototype.getPositionByXY = function(x, y) {
         var self            = this,
-            container       = self.config.container,
+            slotContainer   = self._getSlotContainerAt(x, y);
+        return slotContainer ? slotContainer.slotIndex : undefined;
+    };
+
+    SideView.prototype._getSlotContainerAt = function(x, y) {
+        var self            = this,
+            container       = self.get('container'),
             containerBounds = container.getBounds(),
-            numSlots        = container.getNumChildren(),
-            slotContainer,
-            slotContainerBounds,
-            slotIndex;
+            slotContainers  = self._slotContainers;
 
         if (x < 0 || x > containerBounds.width || y < 0 || y > containerBounds.height) {
             return null;
         }
 
-        for (slotIndex = 0; slotIndex < numSlots; slotIndex++) {
-            slotContainer = container.getChildAt(slotIndex);
-            slotContainerBounds = slotContainer.getBounds();
-            if (x > slotContainerBounds.x && x < (slotContainerBounds.x + slotContainerBounds.width) &&
-                    y > slotContainerBounds.y && y < (slotContainerBounds.y + slotContainerBounds.height)) {
-                return slotContainer;
-            }
-        }
-
-        return null;
+        return Y.Array.find(slotContainers, function(slotContainer){
+            var bounds = slotContainer.getBounds();
+            return x > bounds.x && x < (bounds.x + bounds.width) && y > bounds.y && y < (bounds.y + bounds.height);
+        });
     };
 
     SideView.prototype.updateFormationData = function(changes) {
-        var self        = this,
-            formation   = self.config.formationData.formation,
-            updates     = changes.updates,
-            removes     = changes.removes;
+        var self    = this,
+            units   = self.get('units'),
+            updates = changes.updates,
+            removes = changes.removes;
 
-        Y.each(removes, function(removedPosition) {
-            var currentUnitData = self._getUnitDataByPos(removedPosition);
+        Y.each(removes, function(removePosition) {
+            var currentUnitData = self.getUnitDataAt(removePosition);
 
             if (currentUnitData) {
-                formation.splice(formation.indexOf(currentUnitData), 1);
+                units.splice(units.indexOf(currentUnitData), 1);
             }
 
-            self._renderUnitViewAt(removedPosition);
+            self._renderUnitViewAt(removePosition);
         });
 
         Y.each(updates, function(updatedUnitData) {
-
-            var unitPosition        = updatedUnitData.position,
-                currentUnitData     = self._getUnitDataByPos(unitPosition);
+            var updatePosition    = updatedUnitData.position,
+                currentUnitData = self.getUnitDataAt(updatePosition);
 
             if (currentUnitData) {
-                formation[formation.indexOf(currentUnitData)] = updatedUnitData;
+                units[units.indexOf(currentUnitData)] = updatedUnitData;
             } else {
-                formation[formation.length] = updatedUnitData;
+                units.push(updatedUnitData);
             }
 
-            self._renderUnitViewAt(updatedUnitData.position);
+            self._renderUnitViewAt(updatePosition);
         });
+    };
+
+    SideView.prototype.toggleHighlightAt = function(x, y, isThisHighlight, areOthersHighlight) {
+        var self                = this,
+            thisSlotContainer   = self._getSlotContainerAt(x, y);
+
+        if (areOthersHighlight === undefined) {
+            if (thisSlotContainer) {
+                thisSlotContainer.getChildByName('slot-background').alpha = SLOT_HIGHLIGHTS[(!!isThisHighlight).toString()];
+            }
+        } else {
+            Y.each(self._slotContainers, function(slotContainer){
+                var slotBackground  = slotContainer.getChildByName('slot-background'),
+                    highlightKey    = slotContainer === thisSlotContainer ? (!!isThisHighlight).toString() : (!!areOthersHighlight).toString(),
+                    highlightAlpha  = SLOT_HIGHLIGHTS[highlightKey];
+
+                if (slotBackground.alpha !== highlightAlpha) {
+                    slotBackground.alpha = highlightAlpha;
+                }
+            });
+        }
+    };
+
+    SideView.prototype.bringPositionToTop = function(position) {
+        var self            = this,
+            slotContainer   = self._slotContainers[position - 1];
+
+        self.get('container').setChildIndex(slotContainer, 0);
     };
 
     Y.namespace('Battlefield').SideView = SideView;

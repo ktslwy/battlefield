@@ -26,8 +26,7 @@ YUI.add('battlefield-formation', function (Y) {
     };
 
     Formation.prototype._handleUnitDragStart = function(e) {
-        var self        = this,
-            target      = e.target,
+        var target      = e.target,
             nativeEvent = e._event;
 
         nativeEvent.dataTransfer.effectAllowed = 'move';

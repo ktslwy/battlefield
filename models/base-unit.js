@@ -50,7 +50,6 @@ BaseUnit.prototype.attack = function(targetUnit) {
 BaseUnit.prototype._takeDamage = function(grossDamage) {
     var self        = this,
         healthPoint = self.stats.healthPoint,
-        defended    = self.stats.defense,
         damage      = grossDamage > healthPoint ? healthPoint : grossDamage,
         newHealthPoint;
 

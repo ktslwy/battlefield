@@ -1,6 +1,5 @@
 var assert          = require('chai').assert,
-    LightInfantry   = require('../../../models/light-infantry'),
-    BaseUnit        = require('../../../models/base-unit');
+    LightInfantry   = require('../../../models/light-infantry');
 
 describe('BaseUnit', function(){
 

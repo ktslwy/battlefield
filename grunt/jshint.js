@@ -19,6 +19,7 @@ module.exports = function (grunt) {
             trailing: true,
             undef: true,
             yui: true,
+            unused: true,
             globals: {
                 app: true,
                 dust: true,
