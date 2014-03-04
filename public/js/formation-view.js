@@ -47,7 +47,7 @@ YUI.add('battlefield-formation-view', function (Y) {
 
         self._renderBackground();
         self._renderSide();
-        self._initDragDrop();
+        self._initFormationControl();
     };
 
     FormationView.prototype._renderBackground = function() {
@@ -99,7 +99,7 @@ YUI.add('battlefield-formation-view', function (Y) {
         return sideContainer;
     };
 
-    FormationView.prototype._initDragDrop = function() {
+    FormationView.prototype._initFormationControl = function() {
         var self                    = this,
             formationStage          = self.get('formationStage'),
             sideView                = self._sideView,
@@ -192,6 +192,17 @@ YUI.add('battlefield-formation-view', function (Y) {
                 mouseDownXY = undefined;
             }
         });
+
+        // click inside the canvas
+        formationStage.on('click', function(e){
+            var remove = e.target,
+                position;
+
+            if (remove.name === 'remove') {
+                position = sideView.getPositionByXY(e.stageX, e.stageY);
+                sideView.updateFormationData({removes: [position]});
+            }
+        });
     };
 
     FormationView.prototype._handleDrop = function(from, to) {
@@ -227,7 +238,7 @@ YUI.add('battlefield-formation-view', function (Y) {
     };
 
     FormationView.prototype._handleMouseOverAt = function(x, y) {
-        this._sideView.toggleHighlightAt(x, y, true, false);
+        this._sideView.toggleHighlightByXY(x, y, true, false);
     };
 
     Y.namespace('Battlefield').FormationView = FormationView;

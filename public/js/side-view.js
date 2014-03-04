@@ -205,11 +205,11 @@ YUI.add('battlefield-side-view', function (Y) {
 
     SideView.prototype.getPositionByXY = function(x, y) {
         var self            = this,
-            slotContainer   = self._getSlotContainerAt(x, y);
+            slotContainer   = self._getSlotContainerByXY(x, y);
         return slotContainer ? slotContainer.slotIndex : undefined;
     };
 
-    SideView.prototype._getSlotContainerAt = function(x, y) {
+    SideView.prototype._getSlotContainerByXY = function(x, y) {
         var self            = this,
             container       = self.get('container'),
             containerBounds = container.getBounds(),
@@ -255,22 +255,32 @@ YUI.add('battlefield-side-view', function (Y) {
         });
     };
 
-    SideView.prototype.toggleHighlightAt = function(x, y, isThisHighlight, areOthersHighlight) {
+    SideView.prototype.toggleHighlightByXY = function(x, y, isThisHighlight, areOthersHighlight) {
         var self                = this,
-            thisSlotContainer   = self._getSlotContainerAt(x, y);
+            thisSlotContainer   = self._getSlotContainerByXY(x, y),
+            unitView;
 
         if (areOthersHighlight === undefined) {
             if (thisSlotContainer) {
                 thisSlotContainer.getChildByName('slot-background').alpha = SLOT_HIGHLIGHTS[(!!isThisHighlight).toString()];
+                unitView = self._getUnitViewAt(thisSlotContainer.slotIndex);
+                if (unitView) {
+                    unitView.toggleHighlight(true);
+                }
             }
         } else {
             Y.each(self._slotContainers, function(slotContainer){
                 var slotBackground  = slotContainer.getChildByName('slot-background'),
-                    highlightKey    = slotContainer === thisSlotContainer ? (!!isThisHighlight).toString() : (!!areOthersHighlight).toString(),
-                    highlightAlpha  = SLOT_HIGHLIGHTS[highlightKey];
+                    isHighlight     = slotContainer === thisSlotContainer ? !!isThisHighlight : !!areOthersHighlight,
+                    highlightAlpha  = SLOT_HIGHLIGHTS[isHighlight.toString()],
+                    unitView        = self._getUnitViewAt(slotContainer.slotIndex);
 
                 if (slotBackground.alpha !== highlightAlpha) {
                     slotBackground.alpha = highlightAlpha;
+                }
+
+                if (unitView) {
+                    unitView.toggleHighlight(isHighlight);
                 }
             });
         }

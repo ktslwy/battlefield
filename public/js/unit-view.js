@@ -144,18 +144,11 @@ YUI.add('battlefield-unit-view', function (Y) {
         slotBounds = slotContainer.getBounds();
 
         removeControl = new createjs.Text('DEL', 'bold 10px monospace', 'red');
+        removeControl.name = 'remove';
         removeControl.x = 5;
         removeControl.y = slotBounds.height - 15;
         removeControl.visible = false;
         slotContainer.addChild(removeControl);
-
-        slotContainer.on('rollover', function(){
-            removeControl.visible = false;
-        });
-
-        slotContainer.on('rollout', function(){
-            removeControl.visible = false;
-        });
 
         self._setDisplayObject('removeControl', removeControl);
     };
@@ -255,6 +248,16 @@ YUI.add('battlefield-unit-view', function (Y) {
 
         if (unitData) {
             self.render();
+        }
+    };
+
+    UnitView.prototype.toggleHighlight = function(isHighlight) {
+        var self = this,
+            removeControl;
+
+        if (self.get('isEditMode')) {
+            removeControl = self.getDisplayObject('removeControl');
+            removeControl.visible = !!isHighlight;
         }
     };
 
