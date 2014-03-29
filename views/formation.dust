@@ -1,5 +1,8 @@
 {> "partials/page-header" /}
 
+<div class="data-access">
+    <button class="save-formation">SAVE</button>
+</div>
 <div class="unit-selection">
     <canvas id="formation" width="{appConfig.stageSize.height}" height="{appConfig.stageSize.height}"></canvas>
     <div class="unit-list-wrapper">

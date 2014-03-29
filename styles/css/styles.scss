@@ -13,6 +13,7 @@ body {
     height: $canvasHeight;
 }
 
+.data-access,
 .unit-selection {
     width: $canvasHeight + $unitListWrapperWidth + $nodeMargin;
     margin: $nodeMargin auto;

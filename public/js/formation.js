@@ -17,6 +17,7 @@ YUI.add('battlefield-formation', function (Y) {
 
         self.formationView.render();
         self._initUnitDrag();
+        self._initDataAccess();
     };
 
     Formation.prototype._initUnitDrag = function() {
@@ -33,6 +34,23 @@ YUI.add('battlefield-formation', function (Y) {
         nativeEvent.dataTransfer.setData('unitName', target.ancestor('.unit-info').getData('unit-name'));
     };
 
+    Formation.prototype._initDataAccess = function() {
+        var self = this;
+
+        Y.one('.save-formation').on('click', self._handleSaveFormation, self);
+    };
+
+    Formation.prototype._handleSaveFormation = function() {
+        var self = this,
+            formationData = self.formationView.get('formation');
+
+        Y.io('/formation/', {
+            method: 'POST',
+            data: JSON.stringify(formationData),
+            headers: {'Content-Type': 'application/json'}
+        });
+    };
+
     Y.namespace('Battlefield').Formation = Formation;
 
-}, '0.0.0', {requires: ['battlefield-formation-view', 'node-event-delegate']});
+}, '0.0.0', {requires: ['battlefield-formation-view', 'node-event-delegate', 'io-base']});

@@ -9,6 +9,7 @@ body {
   height: 405px;
 }
 
+.data-access,
 .unit-selection {
   width: 660px;
   margin: 5px auto;
