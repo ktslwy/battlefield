@@ -1,0 +1,13 @@
+{> "partials/page-header" /}
+
+<div id="logo"></div>
+
+<div id="home-menu" class="pure-menu pre-menu-open">
+    <ol class="menu-items">
+        <li class="menu-item"><a href="/battle/">Demo Battle</a></li>
+        <li class="menu-item"><a href="/formation/">Build a Team</a></li>
+        <li class="menu-item"><a href="https://github.com/ktslwy/battlefield" target="_blank">Github Repository</a></li>
+    </ol>
+</div>
+
+{> "partials/page-footer" /}

@@ -1,0 +1,97 @@
+$canvasHeight: 405px;
+$unitListWrapperWidth: 250px;
+$nodeMargin: 5px;
+
+.formation, .battle {
+    background: black;
+}
+
+#battlefield {
+    display: block;
+    margin: 50px auto;
+    width: 900px;
+    height: $canvasHeight;
+}
+
+.unit-selection {
+    width: $canvasHeight + $unitListWrapperWidth + $nodeMargin;
+    margin: $nodeMargin auto;
+}
+
+#formation {
+    width: $canvasHeight;
+    height: $canvasHeight;
+    float: left;
+}
+
+.unit-list-wrapper {
+    height: $canvasHeight;
+    width: $unitListWrapperWidth;
+    float: left;
+    margin-left: $nodeMargin;
+    background-color: gray;
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+$thumbnailWidth: 40px;
+$thumbnailHeight: 40px;
+$spacing: 5px;
+$borderSize: 1px;
+$floatSpacing: $thumbnailWidth + $spacing*2 + $borderSize*2 + $spacing;
+$unitInfoHeight: $thumbnailHeight + $spacing*2 + $borderSize*2;
+
+.unit-info {
+    margin: 5px;
+    height: $unitInfoHeight;
+    border-bottom: 1px solid black;
+    padding-bottom: 5px;
+
+    .unit-stats {
+        margin-left: $floatSpacing;
+        font-size: 77%;
+
+        li {
+            display: inline;
+            margin-right: 6px;
+        }
+
+        h4 {
+            margin: 0 3px 0 0;
+            display: inline;
+        }
+    }
+
+    &:last-child {
+        border: none;
+    }
+}
+
+.unit-thumbnail-wrapper {
+    border: $borderSize solid black;
+    padding: $spacing;
+    float: left;
+    cursor: move;
+}
+
+.unit-thumbnail {
+    width: $thumbnailWidth;
+    height: $thumbnailHeight;
+}
+
+.unit-thumbnail-LightInfantry {
+    background: url('/img/light-infantry-left.png') -3px -25px;
+}
+
+.unit-thumbnail-HeavyInfantry {
+    background: url('/img/heavy-infantry-left.png') -3px -25px;
+}
+
+.unit-title {
+    margin: 0 0 5px $floatSpacing;
+    font-size: 77%;
+}

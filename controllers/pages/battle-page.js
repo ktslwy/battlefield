@@ -5,13 +5,16 @@ var index       = require('../../index'),
 
 module.exports = function(req, res){
     var query       = req.query,
-        battleData  = index(query.left, query.right),
+        left        = query.left || 'hi-li',
+        right       = query.right || 'li-hi',
+        battleData  = index(left, right),
         format      = query.format;
 
     if (format === 'json') {
         res.json(battleData);
     } else {
         res.render('battle', {
+            pageType: 'battle',
             query: query,
             battleData: battleData,
             appConfig: appConfig

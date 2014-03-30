@@ -1,4 +1,49 @@
-body {
+html {
+  height: 100%;
+}
+
+.home {
+  background-image: -webkit-gradient(linear, 50% 100%, 50% 0%, color-stop(0%, #111111), color-stop(100%, #454545));
+  background-image: -webkit-linear-gradient(bottom, #111111 0%, #454545 100%);
+  background-image: -moz-linear-gradient(bottom, #111111 0%, #454545 100%);
+  background-image: -o-linear-gradient(bottom, #111111 0%, #454545 100%);
+  background-image: linear-gradient(bottom, #111111 0%, #454545 100%);
+}
+
+#logo {
+  background-image: url(/img/logo.png);
+  height: 111px;
+  width: 691px;
+  margin: 100px auto 0;
+}
+
+#home-menu {
+  width: 200px;
+  margin: 100px auto 0;
+  background-color: transparent;
+}
+
+.menu-items {
+  margin: 0;
+  padding: 0;
+  border: 1px solid #fff;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 0 20px #454545;
+  -moz-box-shadow: 0 0 20px #454545;
+  box-shadow: 0 0 20px #454545;
+}
+
+.menu-item {
+  list-style: none;
+  margin: 10px;
+  background-color: #fff;
+}
+
+.formation, .battle {
   background: black;
 }
 

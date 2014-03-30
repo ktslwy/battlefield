@@ -9,6 +9,7 @@ var express     = require('express'),
     controllers;
 
 controllers = {
+    homePage        : require('./controllers/pages/home-page'),
     battlePage      : require('./controllers/pages/battle-page'),
     formationPage   : require('./controllers/pages/formation-page')
 };
@@ -23,7 +24,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', controllers.battlePage);
+app.get('/', controllers.homePage);
+app.get('/battle', controllers.battlePage);
 app.get('/formation', controllers.formationPage);
 
 http.createServer(app).listen(app.get('port'), function(){

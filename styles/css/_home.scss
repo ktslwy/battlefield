@@ -1,0 +1,30 @@
+.home {
+    @include background-image(linear-gradient(bottom, #111111 0%, #454545 100%));
+}
+
+#logo {
+    background-image: url(/img/logo.png);
+    height: 111px;
+    width: 691px;
+    margin: 100px auto 0;
+}
+
+#home-menu {
+    width: 200px;
+    margin: 100px auto 0;
+    background-color: transparent;
+}
+
+.menu-items {
+    margin: 0;
+    padding: 0;
+    border: 1px solid #fff;
+    @include border-radius(5px);
+    @include box-shadow(0 0 20px #454545);
+}
+
+.menu-item {
+    list-style: none;
+    margin: 10px;
+    background-color: #fff;
+}
