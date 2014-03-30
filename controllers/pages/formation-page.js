@@ -19,6 +19,7 @@ module.exports = function(req, res){
     }
 
     res.render('formation', {
+        pageType: 'formation',
         query: query,
         appConfig: appConfig,
         units: units

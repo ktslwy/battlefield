@@ -9,6 +9,7 @@ var express     = require('express'),
     controllers;
 
 controllers = {
+    homePage        : require('./controllers/pages/home-page'),
     battlePage      : require('./controllers/pages/battle-page'),
     formationPage   : require('./controllers/pages/formation-page'),
     saveFormation   : require('./controllers/services/save-formation')
@@ -26,7 +27,8 @@ app.use(express.bodyParser());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', controllers.battlePage);
+app.get('/', controllers.homePage);
+app.get('/battle', controllers.battlePage);
 app.get('/formation', controllers.formationPage);
 app.post('/formation', controllers.saveFormation);
 
