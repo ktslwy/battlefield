@@ -6,6 +6,8 @@ function handleHomePage(req, res) {
     var query = req.query;
 
     res.render('home', {
+        context: req.context,
+        session: req.session,
         pageType: 'home',
         query: query,
         appConfig: appConfig

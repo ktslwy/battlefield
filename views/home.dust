@@ -2,6 +2,14 @@
 
 <div id="logo"></div>
 
+<div id="welcome-msg">
+    {@eq key="{context.signedIn}" value="true"}
+        <p>Welcome {session.userName}!</p>
+    {:else}
+        <p>New user?<button id="sign-in-button" class="pure-button pure-button-primary">Sign In</button>to start!</p>
+    {/eq}
+</div>
+
 <div id="home-menu" class="pure-menu pre-menu-open">
     <ol class="menu-items">
         <li class="menu-item"><a href="/battle/">Demo Battle</a></li>
@@ -9,5 +17,23 @@
         <li class="menu-item"><a href="https://github.com/ktslwy/battlefield" target="_blank">Github Repository</a></li>
     </ol>
 </div>
+
+<script>
+yui.use('node', 'battlefield-sign-in', function(Y){
+
+    var signInButton = Y.one('#sign-in-button');
+
+    if (signInButton) {
+        var signIn = new Y.Battlefield.SignIn({
+            button: signInButton
+        });
+    }
+
+});
+</script>
+
+{@ne key="{context.signedIn}" value="true"}
+    {> "partials/sign-in-overlay" /}
+{/ne}
 
 {> "partials/page-footer" /}

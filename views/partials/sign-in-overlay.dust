@@ -1,0 +1,7 @@
+<div id="sign-in-overlay" class="hidden">
+    <div class="yui3-widget-bd">
+        <p>Username:</p>
+        <input type="text" id="sign-in-username" placeholder="Username">
+        <button class="pure-button pure-button-primary">Sign In</button>
+    </div>
+</div>

@@ -3,3 +3,16 @@
 html {
     height: 100%;
 }
+
+.hidden {
+	display: none;
+}
+
+.yui3-overlay-modal {
+	outline: none;
+}
+
+.yui3-overlay-mask {
+    background: #fff;
+    opacity: 0.5;
+}
