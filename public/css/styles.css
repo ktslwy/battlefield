@@ -30,11 +30,30 @@ html {
   margin: 100px auto 0;
 }
 
-#welcome-msg {
+#home-messages {
+  margin-top: 50px;
+}
+
+.message-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.message-item {
   text-align: center;
-  margin: 50px auto 0;
+  margin: 10px auto 0;
+}
+.message-item .message {
   color: #ddd;
   font-weight: 300;
+  display: inline-block;
+}
+.message-item .message p {
+  margin: 0;
+}
+.message-item .message p a, .message-item .message p button {
+  margin: 0 10px;
 }
 
 #home-menu {
@@ -78,10 +97,6 @@ html {
   height: 30px;
   margin-right: 15px;
   padding-left: 15px;
-}
-
-#sign-in-button {
-  margin: 0 10px;
 }
 
 .formation, .battle {

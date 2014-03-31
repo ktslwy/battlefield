@@ -2,12 +2,28 @@
 
 <div id="logo"></div>
 
-<div id="welcome-msg">
-    {@eq key="{context.signedIn}" value="true"}
-        <p>Welcome {session.userName}!</p>
-    {:else}
-        <p>New user?<button id="sign-in-button" class="pure-button pure-button-primary">Sign In</button>to start!</p>
-    {/eq}
+<div id="home-messages">
+    <ul class="message-list">
+        <li class="message-item">
+            <div id="welcome-msg" class="message">
+                {#context.signedIn}
+                    <p>Welcome {session.userName}!</p>
+                {:else}
+                    <p>New user?<button id="sign-in-button" class="pure-button pure-button-primary">Sign In</button>to start!</p>
+                {/context.signedIn}
+            </div>
+        </li>
+
+        {#context.signedIn}
+            {^context.hasTeam}
+                <li class="message-item">
+                    <div id="build-team-msg" class="message">
+                        <p>Don't have a team yet?<a href="/formation/" class="pure-button pure-button-primary">Let's build one</a></p>
+                    </div>
+                </li>
+            {/context.hasTeam}
+        {/context.signedIn}
+    </ul>
 </div>
 
 <div id="home-menu" class="pure-menu pre-menu-open">
